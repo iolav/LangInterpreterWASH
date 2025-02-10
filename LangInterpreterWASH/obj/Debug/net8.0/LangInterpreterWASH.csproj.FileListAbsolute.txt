@@ -1,0 +1,14 @@
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\bin\Debug\net8.0\LangInterpreterWASH.exe
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\bin\Debug\net8.0\LangInterpreterWASH.deps.json
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\bin\Debug\net8.0\LangInterpreterWASH.runtimeconfig.json
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\bin\Debug\net8.0\LangInterpreterWASH.dll
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\bin\Debug\net8.0\LangInterpreterWASH.pdb
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.AssemblyInfoInputs.cache
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.AssemblyInfo.cs
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.csproj.CoreCompileInputs.cache
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.dll
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\refint\LangInterpreterWASH.dll
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.pdb
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.genruntimeconfig.cache
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\ref\LangInterpreterWASH.dll
