@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LangInterpreterWASH")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+869806671b31324e904f3a06020b62e0f03d7474")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cabf8fd3f2b95a63b07f0e96f75816d0e0d6d6eb")]
 [assembly: System.Reflection.AssemblyProductAttribute("LangInterpreterWASH")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LangInterpreterWASH")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
