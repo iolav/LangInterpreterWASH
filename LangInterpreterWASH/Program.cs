@@ -1,3 +1,6 @@
-﻿Lexer Lex = new();
+﻿using System.Collections;
 
-Lex.Tokenize("Hello!");
+Lexer Lex = new(@"\test.wash");
+
+Queue TokenQueue = Lex.Tokenize();
+Lex.DebugTQ(TokenQueue);

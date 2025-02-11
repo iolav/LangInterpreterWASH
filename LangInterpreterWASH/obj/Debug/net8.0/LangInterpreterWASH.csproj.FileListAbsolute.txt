@@ -12,3 +12,4 @@ C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\
 C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.pdb
 C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.genruntimeconfig.cache
 C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\ref\LangInterpreterWASH.dll
+C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\obj\Debug\net8.0\LangInterpreterWASH.sourcelink.json
