@@ -7,8 +7,8 @@ class Token(string C, string V) // To store a tokens value and associating class
 }
 
 class Tokenizer {
-    readonly char[] Operators = ['+', '-'];
-    readonly string[] Keywords = [];
+    readonly private char[] Operators = ['+', '-'];
+    readonly private string[] Keywords = [];
 
     public Queue Process(string Data) { // Tokenize all data
         Queue TokenQueue = new();
