@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
+      "projectUniqueName": "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
       "projectName": "LangInterpreterWASH",
-      "projectPath": "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
+      "projectPath": "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
       "packagesPath": "C:\\Users\\treys\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\obj\\",
+      "outputPath": "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\treys\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -66,7 +66,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
