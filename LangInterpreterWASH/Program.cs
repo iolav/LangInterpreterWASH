@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 
-Lexer Lex = new(@"C:\Users\treys\Desktop\LangInterpreterWASH\LangInterpreterWASH\test.wash");
+Lexer Lex = new();
 
-Queue TokenQueue = Lex.Tokenize();
+Queue TokenQueue = Lex.Tokenize("13.5 + 2.65");
 
 Lex.DebugTQ(TokenQueue);
