@@ -1,7 +1,5 @@
+using System.CodeDom.Compiler;
 using System.Collections;
-using System.Data;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
 
 class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to store things for the AST
     public string Action = A;
@@ -11,14 +9,14 @@ class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to sto
 }
 
 class Parser(Queue<Token> TokenQueue) {
-    public ASTNode Parse() {
+    public ASTNode Parse() { // Public method to invoke parsing
         return Expression();
     }
 
-    private ASTNode Expression() {
+    private ASTNode Expression() { // Handle addition and subtraction
         ASTNode Node = Term();
 
-        while (Peek() == "Plus" || Peek() == "Minus") {
+        while (Peek().Value == "+" || Peek().Value == "-") {
             Token Operator = Dequeue();
             Node = new ASTNode(Operator.Classifier, Operator.Value, Node, Term());
         }
@@ -26,10 +24,10 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private ASTNode Term() {
+    private ASTNode Term() { // Handle multiplication and division
         ASTNode Node = Factor();
 
-        while (Peek() == "Multiply" || Peek() == "Divide") {
+        while (Peek().Value == "*" || Peek().Value == "/") {
             Token Operator = Dequeue();
             Node = new ASTNode(Operator.Classifier, Operator.Value, Node, Factor());
         }
@@ -37,15 +35,15 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private ASTNode Factor() {
-        if (Peek() == "Number")
+    private ASTNode Factor() { // Handle numbers and parenthesis 
+        if (Peek().Classifier == "Number")
             return new ASTNode("Number", Dequeue().Value, null, null);
-        else if (Peek() == "LParen") {
+        else if (Peek().Value == "(") {
             Dequeue();
 
             ASTNode Node = Expression();
 
-            if (Peek() != "RParen")
+            if (Peek().Value != ")")
                 throw new Exception();
             
             Dequeue();
@@ -56,11 +54,11 @@ class Parser(Queue<Token> TokenQueue) {
         throw new Exception();
     }
 
-    private string? Peek() {
+    private Token Peek() {
         if (TokenQueue.Count > 0)
-            return TokenQueue.Peek().Classifier;
+            return TokenQueue.Peek();
 
-        return null;
+        return new Token("null", "null");
     }
 
     private Token Dequeue() {
@@ -68,5 +66,14 @@ class Parser(Queue<Token> TokenQueue) {
             return TokenQueue.Dequeue();
         
         throw new Exception();
+    }
+
+    public void DebugNodes(ASTNode Node, int Indent = 0) {
+        Console.WriteLine($"{new string(' ', Indent)} {Node.Action} {Node.Value}");
+
+        if (Node.Left != null)
+            DebugNodes(Node.Left, Indent + 4);
+        if (Node.Right != null)
+            DebugNodes(Node.Right, Indent + 4);
     }
 }

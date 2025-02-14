@@ -10,8 +10,24 @@ class Tokenizer {
     readonly private char[] Operators = ['+', '-'];
     readonly private string[] Keywords = [];
 
-    public Queue Process(string Data) { // Tokenize all data
-        Queue TokenQueue = new();
+    private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
+        bool IsHyphen = RawChar == '-';
+        Console.WriteLine($"IsHyphen: {IsHyphen}");
+
+        bool HasNextIsInt = Pos + 1 < Data.Length && int.TryParse(Data[Pos + 1].ToString(), out _);
+        Console.WriteLine($"HasNextIsInt: {HasNextIsInt}");
+
+        bool HasPrevious = Pos - 1 > -1;
+        bool PrevIsOperator = HasPrevious && Operators.Contains(Data[Pos - 1]);
+        bool PrevIsOpenParen = HasPrevious && Data[Pos - 1] == '(';
+
+        Console.WriteLine($"HasPrevious: {HasPrevious}, PrevIsOperator: {PrevIsOperator}, PrevIsOpenParen: {PrevIsOpenParen}\n");
+
+        return IsHyphen && HasNextIsInt && (Pos == 0 || PrevIsOperator || PrevIsOpenParen || char.IsWhiteSpace(Data[Pos - 1]));
+    }
+
+    public Queue<Token> Process(string Data) { // Tokenize all data
+        Queue<Token> TokenQueue = new();
 
         int Len = Data.Length;
         int Pos = 0;
@@ -24,9 +40,14 @@ class Tokenizer {
                 Pos++; continue;
             }
 
-            if (int.TryParse(Segment, out _)) { // Handle numbers
+            bool IsInt = int.TryParse(RawChar.ToString(), out _);
+            if (IsInt || CheckUnary(RawChar, Data, Pos)) { // Handle numbers
                 int Start = Pos;
                 bool Deci = false;
+                bool IsNeg = RawChar == '-';
+
+                if (IsNeg)
+                    Pos++;
 
                 while (Pos < Len && (int.TryParse(Data[Pos].ToString(), out _) || Data[Pos] == '.')) {
                     if (Data[Pos] == '.') {
@@ -60,6 +81,11 @@ class Tokenizer {
                 Pos++; continue;
             }
 
+            if (RawChar == '(' || RawChar == ')') { // Handle parenthesis
+                TokenQueue.Enqueue(new Token("PAREN", Segment));
+                Pos++; continue;
+            }
+
             TokenQueue.Enqueue(new Token("Unknown", Segment)); // Handle unknowns
 
             Pos++;
@@ -83,14 +109,14 @@ class Lexer {
         T = new Tokenizer();
     }
 
-    public Queue Tokenize(string Data) { // Public/Main method to use tokenizer
+    public Queue<Token> Tokenize(string Data) { // Public/Main method to use tokenizer
         return T.Process(Data);
     }
-    public Queue Tokenize() { // Public/Main method to use tokenizer
+    public Queue<Token> Tokenize() { // Public/Main method to use tokenizer
         return T.Process(FileData);
     }
 
-    public void DebugTQ(Queue TokenQueue) { // Debug TokenQueue by printing it out
+    public void DebugTQ(Queue<Token> TokenQueue) { // Debug TokenQueue by printing it out
         foreach(Token T in TokenQueue)
             Console.WriteLine($"T:\n  : {T.Value}\n  : {T.Classifier}");
     }
