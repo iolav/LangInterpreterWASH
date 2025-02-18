@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 
 Lexer Lex = new();
-Queue<Token> TokenQueue = Lex.Tokenize("-(5 - 1) + 2");
+Queue<Token> TokenQueue = Lex.Tokenize("-(-(3 - (-(5 + 2)) + (-4 - (-1))) + (-(-6 + 2) - 3))");
 Lex.DebugTQ(TokenQueue);
 
 Console.Write("\n");

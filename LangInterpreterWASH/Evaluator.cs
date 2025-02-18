@@ -1,5 +1,5 @@
 class Evaluator() {
-    public float Evaluate(ASTNode Node) {
+    public float Evaluate(ASTNode Node) { // Evaluation
         if (Node.Action == "Number") {
             return float.Parse(Node.Value);
         }
@@ -15,8 +15,19 @@ class Evaluator() {
                 return Left + Right;
             else if (Node.Value == "-")
                 return Left - Right;
+            else if (Node.Value == "*")
+                return Left * Right;
+            else if (Node.Value == "/")
+                return Left / Right;
         }
 
-        throw new Exception(); 
+        if (Node.Action == "Negate") {
+            if (Node.Left == null)
+                throw new Exception();
+
+            return -Evaluate(Node.Left);
+        }
+
+        throw new Exception();
     }
 }

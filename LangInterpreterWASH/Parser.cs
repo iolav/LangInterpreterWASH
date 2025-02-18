@@ -36,6 +36,25 @@ class Parser(Queue<Token> TokenQueue) {
     }
 
     private ASTNode Factor() { // Handle numbers and parenthesis 
+        if (Peek().Value == "-") {
+            Dequeue();
+            
+            if (Peek().Value == "(") {
+                Dequeue();
+
+                ASTNode Node = Expression();
+
+                if (Peek().Value != ")")
+                    throw new Exception();
+                
+                Dequeue();
+
+                return new ASTNode("Negate", "-", Node, null);
+            }
+
+            throw new Exception();
+        }
+
         if (Peek().Classifier == "Number")
             return new ASTNode("Number", Dequeue().Value, null, null);
         else if (Peek().Value == "(") {
