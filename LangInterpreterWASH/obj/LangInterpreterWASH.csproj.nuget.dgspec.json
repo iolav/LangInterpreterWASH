@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj": {}
+    "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj": {}
   },
   "projects": {
-    "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj": {
+    "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
+        "projectUniqueName": "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
         "projectName": "LangInterpreterWASH",
-        "projectPath": "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
+        "projectPath": "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\LangInterpreterWASH.csproj",
         "packagesPath": "C:\\Users\\treys\\.nuget\\packages\\",
-        "outputPath": "E:\\Projects\\LangInterpreterWASH\\LangInterpreterWASH\\obj\\",
+        "outputPath": "C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\LangInterpreterWASH\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\treys\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -60,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
