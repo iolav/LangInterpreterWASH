@@ -1,7 +1,5 @@
-﻿using System.Collections;
-
-Lexer Lex = new();
-Queue<Token> TokenQueue = Lex.Tokenize("-(-(3 - (-(5 + 2)) + (-4 - (-1))) + (-(-6 + 2) - 3))");
+﻿Lexer Lex = new();
+Queue<Token> TokenQueue = Lex.Tokenize("(1 * 2) / 2");
 Lex.DebugTQ(TokenQueue);
 
 Console.Write("\n");

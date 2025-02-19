@@ -1,6 +1,3 @@
-using System.CodeDom.Compiler;
-using System.Collections;
-
 class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to store things for the AST
     public string Action = A;
     public string Value = V;
@@ -45,14 +42,14 @@ class Parser(Queue<Token> TokenQueue) {
                 ASTNode Node = Expression();
 
                 if (Peek().Value != ")")
-                    throw new Exception();
+                    throw new Exception("Syntax Error - Missing closing parenthesis"); // Test case: "-(1 + 1"
                 
                 Dequeue();
 
                 return new ASTNode("Negate", "-", Node, null);
             }
 
-            throw new Exception();
+            throw new Exception("Syntax Error - Expected parenthesis or number after negative"); // Test case: "-"
         }
 
         if (Peek().Classifier == "Number")
@@ -63,14 +60,14 @@ class Parser(Queue<Token> TokenQueue) {
             ASTNode Node = Expression();
 
             if (Peek().Value != ")")
-                throw new Exception();
+                throw new Exception("Syntax Error - Missing closing parenthesis"); // Test case: "(1 + 1"
             
             Dequeue();
 
             return Node;
         }
 
-        throw new Exception();
+        throw new Exception("Internal Error - Unexpected input for factor"); // Shouldnt ever get here
     }
 
     private Token Peek() {
@@ -84,7 +81,7 @@ class Parser(Queue<Token> TokenQueue) {
         if (TokenQueue.Count > 0)
             return TokenQueue.Dequeue();
         
-        throw new Exception();
+        throw new Exception("Internal Error - Tried to get next token in empty queue"); // Shouldnt ever get here
     }
 
     public void DebugNodes(ASTNode Node, int Indent = 0) {
