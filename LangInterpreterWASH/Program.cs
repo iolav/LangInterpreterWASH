@@ -1,5 +1,5 @@
-﻿Lexer Lex = new();
-Queue<Token> TokenQueue = Lex.Tokenize("(1 * 2) / 2");
+﻿Lexer Lex = new("C:\\Users\\treys\\Desktop\\LangInterpreterWASH\\test.wash");
+Queue<Token> TokenQueue = Lex.Tokenize();
 Lex.DebugTQ(TokenQueue);
 
 Console.Write("\n");
@@ -9,5 +9,6 @@ ASTNode RootNode = Parse.Parse();
 Parse.DebugNodes(RootNode);
 
 Evaluator Eval = new();
-float Result = Eval.Evaluate(RootNode);
-Console.WriteLine($"\n{Result}");
+Variables Vars = new();
+Eval.Evaluate(RootNode, Vars);
+Vars.DebugAll();

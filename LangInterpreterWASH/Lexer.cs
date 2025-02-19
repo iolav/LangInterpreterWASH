@@ -1,4 +1,5 @@
 using System.Collections;
+using System.ComponentModel.DataAnnotations;
 
 class Token(string C, string V) // To store a tokens value and associating classifier
 {
@@ -12,16 +13,12 @@ class Tokenizer {
 
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
         bool IsHyphen = RawChar == '-';
-        Console.WriteLine($"IsHyphen: {IsHyphen}");
 
         bool HasNextIsInt = Pos + 1 < Data.Length && int.TryParse(Data[Pos + 1].ToString(), out _);
-        Console.WriteLine($"HasNextIsInt: {HasNextIsInt}");
 
         bool HasPrevious = Pos - 1 > -1;
         bool PrevIsOperator = HasPrevious && Operators.Contains(Data[Pos - 1]);
         bool PrevIsOpenParen = HasPrevious && Data[Pos - 1] == '(';
-
-        Console.WriteLine($"HasPrevious: {HasPrevious}, PrevIsOperator: {PrevIsOperator}, PrevIsOpenParen: {PrevIsOpenParen}\n");
 
         return IsHyphen && HasNextIsInt && (Pos == 0 || PrevIsOperator || PrevIsOpenParen || char.IsWhiteSpace(Data[Pos - 1]));
     }
@@ -81,8 +78,13 @@ class Tokenizer {
                 Pos++; continue;
             }
 
+            if (RawChar == '=') {
+                TokenQueue.Enqueue(new Token("Assignment", Segment));
+                Pos++; continue;
+            }
+
             if (RawChar == '(' || RawChar == ')') { // Handle parenthesis
-                TokenQueue.Enqueue(new Token("PAREN", Segment));
+                TokenQueue.Enqueue(new Token("Parenthesis", Segment));
                 Pos++; continue;
             }
 
@@ -104,6 +106,8 @@ class Lexer {
         
         if (File.Exists(Path))
             FileData = File.ReadAllText(Path);
+        else
+            throw new Exception("Read Error - Couldn't find file"); // File does not exist
     }
     public Lexer() { // Not using file, expects manual data later when calling Tokenize
         T = new Tokenizer();
@@ -113,6 +117,9 @@ class Lexer {
         return T.Process(Data);
     }
     public Queue<Token> Tokenize() { // Public/Main method to use tokenizer
+        if (FileData.Length <= 0)
+            throw new Exception("Read Error - Empty file"); // File existed, but was empty
+
         return T.Process(FileData);
     }
 

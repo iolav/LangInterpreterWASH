@@ -7,7 +7,7 @@ class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to sto
 
 class Parser(Queue<Token> TokenQueue) {
     public ASTNode Parse() { // Public method to invoke parsing
-        return Expression();
+        return Assignment();
     }
 
     private ASTNode Expression() { // Handle addition and subtraction
@@ -65,9 +65,27 @@ class Parser(Queue<Token> TokenQueue) {
             Dequeue();
 
             return Node;
-        }
+        } else if (Peek().Classifier == "Identifier")
+            return new ASTNode("Variable", Dequeue().Value, null, null);
 
         throw new Exception("Internal Error - Unexpected input for factor"); // Shouldnt ever get here
+    }
+
+    private ASTNode Assignment() {
+        ASTNode Node = Expression();
+
+        if (Peek().Value == "=") {
+            Token AssignToken = Dequeue();
+
+            if (Node.Action != "Variable")
+                throw new Exception("Syntax Error - No identifier found for assignment");
+
+            ASTNode RightHandSide = Expression();
+
+            return new ASTNode("Assignment", AssignToken.Value, Node, RightHandSide);
+        }
+
+        return Node;
     }
 
     private Token Peek() {
@@ -81,7 +99,7 @@ class Parser(Queue<Token> TokenQueue) {
         if (TokenQueue.Count > 0)
             return TokenQueue.Dequeue();
         
-        throw new Exception("Internal Error - Tried to get next token in empty queue"); // Shouldnt ever get here
+        throw new Exception("Internal Error - Tried to pop next token in empty queue"); // Shouldnt ever get here
     }
 
     public void DebugNodes(ASTNode Node, int Indent = 0) {
