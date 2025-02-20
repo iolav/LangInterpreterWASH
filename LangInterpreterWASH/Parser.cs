@@ -71,7 +71,7 @@ class Parser(Queue<Token> TokenQueue) {
         throw new Exception("Internal Error - Unexpected input for factor"); // Shouldnt ever get here
     }
 
-    private ASTNode Assignment() {
+    private ASTNode Assignment() { // Handle variable assignments
         ASTNode Node = Expression();
 
         if (Peek().Value == "=") {
@@ -88,21 +88,21 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private Token Peek() {
+    private Token Peek() { // DRY for peeking
         if (TokenQueue.Count > 0)
             return TokenQueue.Peek();
 
         return new Token("null", "null");
     }
 
-    private Token Dequeue() {
+    private Token Dequeue() { // DRY for dequeueing
         if (TokenQueue.Count > 0)
             return TokenQueue.Dequeue();
         
         throw new Exception("Internal Error - Tried to pop next token in empty queue"); // Shouldnt ever get here
     }
 
-    public void DebugNodes(ASTNode Node, int Indent = 0) {
+    public void DebugNodes(ASTNode Node, int Indent = 0) { // To help debug by printing out all nodes formatted`
         Console.WriteLine($"{new string(' ', Indent)} {Node.Action} {Node.Value}");
 
         if (Node.Left != null)
