@@ -1,10 +1,16 @@
 class Evaluator() {
-    public double Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
+    public void StartEval(Queue<ASTNode> Roots, Variables Vars) { // Public method to evaluate all root nodes
+        while (Roots.Count > 0) {
+            Evaluate(Roots.Dequeue(), Vars);
+        }
+    } 
+
+    private double Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
         if (Node.Action == "Integer") {
             return int.Parse(Node.Value);
         } else if (Node.Action == "Float") {
             return float.Parse(Node.Value);
-        } else if (Node.Action == "Variable") {
+        } else if (Node.Action == "Variable" && Vars.Find(Node.Value)) {
             return (double)Vars.Fetch(Node.Value);
         }
 
@@ -41,7 +47,7 @@ class Evaluator() {
             return 0;
         }
 
-        else if (Node.Action == "Empty") {
+        else if (Node.Action == "Empty" || Node.Action == "Program") {
             return 0;
         }
 

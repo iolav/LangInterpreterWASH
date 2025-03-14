@@ -5,10 +5,10 @@ Lex.DebugTQ(TokenQueue);
 Console.Write("\n");
 
 Parser Parse = new(TokenQueue);
-ASTNode RootNode = Parse.Parse();
-Parse.DebugNodes(RootNode);
+Queue<ASTNode> Roots = Parse.Parse();
+Parse.DebugRoots(Roots);
 
 Evaluator Eval = new();
 Variables Vars = new();
-Eval.Evaluate(RootNode, Vars);
+Eval.StartEval(Roots, Vars);
 Vars.DebugAll();

@@ -10,23 +10,14 @@ class Parser(Queue<Token> TokenQueue) {
         return Assignment();
     }
     
-    public ASTNode Parse() { // Public method to invoke parsing
-        ASTNode? Root = null;
-        ASTNode? Current = null;
+    public Queue<ASTNode> Parse() { // Public method to invoke parsing    
+        Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            ASTNode NextStatement = Statement();
-
-            if (Root == null) {
-                Root = NextStatement;
-                Current = Root;
-            } else if (Current != null) {
-                Current.Right = NextStatement;
-                Current = NextStatement;
-            }
+            Roots.Enqueue(Statement());
         }
 
-        return Root ?? new ASTNode("Empty", "", null, null);
+        return Roots;
     }
 
     private ASTNode Expression() { // Handle addition and subtraction
@@ -124,7 +115,13 @@ class Parser(Queue<Token> TokenQueue) {
         throw new Exception(); // Shouldnt ever get here
     }
 
-    public void DebugNodes(ASTNode Node, int Indent = 0) { // To help debug by printing out all nodes formatted`
+    public void DebugRoots(Queue<ASTNode> Roots) { // To help debug by printing out all nodes formatted
+        Queue<ASTNode> RootsCopy = new(Roots);
+        while (RootsCopy.Count > 0) {
+            DebugNodes(RootsCopy.Dequeue());
+        }
+    }
+    private void DebugNodes(ASTNode Node, int Indent = 0) {
         Console.WriteLine($"{new string(' ', Indent)} {Node.Action} {Node.Value}");
 
         if (Node.Left != null)

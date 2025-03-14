@@ -10,7 +10,7 @@ class Token(string C, string V) // To store a tokens value and associating class
 
 class Tokenizer {
     readonly private char[] Operators = ['+', '-', '*', '/'];
-    readonly private string[] Keywords = ["class"];
+    readonly private string[] Keywords = [];
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
         bool IsHyphen = RawChar == '-';

@@ -9,8 +9,12 @@ class Variables {
         Storage[Identifier] = Value;
     }
 
-    public object Fetch(string Identifier) { // Public method for storing a variable
+    public object Fetch(string Identifier) { // Public method for fetching a variable
         return Storage[Identifier];
+    }
+
+    public bool Find(string Identifier) { // Public method for checking if a variable exists
+        return Storage.ContainsKey(Identifier);
     }
 
     public void DebugAll() { // Debugging method to just dump all the values
