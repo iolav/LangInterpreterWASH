@@ -1,15 +1,19 @@
 class Evaluator() {
-    public float Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
-        if (Node.Action == "Number") {
+    public double Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
+        if (Node.Action == "Integer") {
+            return int.Parse(Node.Value);
+        } else if (Node.Action == "Float") {
             return float.Parse(Node.Value);
-        } 
+        } else if (Node.Action == "Variable") {
+            return (double)Vars.Fetch(Node.Value);
+        }
 
         else if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
-                throw new Exception("Internal Error - Left or right node null for operation"); // Shouldnt ever get here
+                throw new Exception(); // Shouldnt ever get here
 
-            float Left = Evaluate(Node.Left, Vars);
-            float Right = Evaluate(Node.Right, Vars);
+            double Left = Evaluate(Node.Left, Vars);
+            double Right = Evaluate(Node.Right, Vars);
 
             if (Node.Value == "+")
                 return Left + Right;
@@ -23,20 +27,24 @@ class Evaluator() {
 
         else if (Node.Action == "Negate") {
             if (Node.Left == null)
-                throw new Exception("Internal Error - Left node null on negation"); // Shouldnt ever get here
+                throw new Exception(); // Shouldnt ever get here
 
             return -Evaluate(Node.Left, Vars);
         }
 
         else if (Node.Action == "Assignment") {
             if (Node.Left == null || Node.Right == null)
-                throw new Exception("Internal Error - Left or right node null for assignment"); // Shouldnt ever get here
+                throw new Exception(); // Shouldnt ever get here
 
             Vars.Store(Node.Left.Value, Evaluate(Node.Right, Vars));
 
-            return 0f;
+            return 0;
         }
 
-        throw new Exception("Internal Error - Unknown node action"); // Sometimes gets here, will fix later
+        else if (Node.Action == "Empty") {
+            return 0;
+        }
+
+        throw new Exception(); // Can happen if previous statements fail or no invalid Action
     }
 }

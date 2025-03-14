@@ -6,8 +6,27 @@ class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to sto
 }
 
 class Parser(Queue<Token> TokenQueue) {
-    public ASTNode Parse() { // Public method to invoke parsing
+    private ASTNode Statement() {
         return Assignment();
+    }
+    
+    public ASTNode Parse() { // Public method to invoke parsing
+        ASTNode? Root = null;
+        ASTNode? Current = null;
+
+        while (TokenQueue.Count > 0) {
+            ASTNode NextStatement = Statement();
+
+            if (Root == null) {
+                Root = NextStatement;
+                Current = Root;
+            } else if (Current != null) {
+                Current.Right = NextStatement;
+                Current = NextStatement;
+            }
+        }
+
+        return Root ?? new ASTNode("Empty", "", null, null);
     }
 
     private ASTNode Expression() { // Handle addition and subtraction
@@ -21,7 +40,7 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private ASTNode Term() { // Handle multiplication and division
+    private ASTNode Term() { // Handle term
         ASTNode Node = Factor();
 
         while (Peek().Value == "*" || Peek().Value == "/") {
@@ -32,7 +51,7 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private ASTNode Factor() { // Handle numbers and parenthesis 
+    private ASTNode Factor() { // Handle factors
         if (Peek().Value == "-") {
             Dequeue();
             
@@ -42,33 +61,36 @@ class Parser(Queue<Token> TokenQueue) {
                 ASTNode Node = Expression();
 
                 if (Peek().Value != ")")
-                    throw new Exception("Syntax Error - Missing closing parenthesis"); // Test case: "-(1 + 1"
+                    throw new Exception(); // Test case: "-(1 + 1"
                 
                 Dequeue();
 
                 return new ASTNode("Negate", "-", Node, null);
             }
 
-            throw new Exception("Syntax Error - Expected parenthesis or number after negative"); // Test case: "-"
+            throw new Exception(); // Test case: "-"
         }
 
-        if (Peek().Classifier == "Number")
-            return new ASTNode("Number", Dequeue().Value, null, null);
-        else if (Peek().Value == "(") {
+        Token Next = Peek();
+        if (Next.Classifier == "Float" || Next.Classifier == "Integer")
+            return new ASTNode(Next.Classifier, Dequeue().Value, null, null);
+        else if (Next.Value == "(") {
             Dequeue();
 
             ASTNode Node = Expression();
 
-            if (Peek().Value != ")")
-                throw new Exception("Syntax Error - Missing closing parenthesis"); // Test case: "(1 + 1"
+            if (Next.Value != ")")
+                throw new Exception(); // Test case: "(1 + 1"
             
             Dequeue();
 
             return Node;
-        } else if (Peek().Classifier == "Identifier")
+        } else if (Next.Classifier == "Identifier") 
             return new ASTNode("Variable", Dequeue().Value, null, null);
+        else if (Next.Classifier == "Keyword")
+            return new ASTNode("Keyword", Dequeue().Value, null, null);
 
-        throw new Exception("Internal Error - Unexpected input for factor"); // Shouldnt ever get here
+        throw new Exception(); // Gets here if no input is provided
     }
 
     private ASTNode Assignment() { // Handle variable assignments
@@ -78,7 +100,7 @@ class Parser(Queue<Token> TokenQueue) {
             Token AssignToken = Dequeue();
 
             if (Node.Action != "Variable")
-                throw new Exception("Syntax Error - No identifier found for assignment");
+                throw new Exception();
 
             ASTNode RightHandSide = Expression();
 
@@ -88,18 +110,18 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private Token Peek() { // DRY for peeking
+    private Token Peek() { // DRY method for peeking
         if (TokenQueue.Count > 0)
             return TokenQueue.Peek();
 
         return new Token("null", "null");
     }
 
-    private Token Dequeue() { // DRY for dequeueing
+    private Token Dequeue() { // DRY method for dequeueing
         if (TokenQueue.Count > 0)
             return TokenQueue.Dequeue();
         
-        throw new Exception("Internal Error - Tried to pop next token in empty queue"); // Shouldnt ever get here
+        throw new Exception(); // Shouldnt ever get here
     }
 
     public void DebugNodes(ASTNode Node, int Indent = 0) { // To help debug by printing out all nodes formatted`

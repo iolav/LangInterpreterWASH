@@ -1,16 +1,17 @@
-using System.Collections;
-using System.ComponentModel.DataAnnotations;
-
 class Token(string C, string V) // To store a tokens value and associating classifier
 {
     public readonly string Classifier = C;
     public readonly string Value = V;
+
+    public override string ToString() {
+        return $"T:\n  : {Value}\n  : {Classifier}";
+    }
 }
 
 class Tokenizer {
     readonly private char[] Operators = ['+', '-', '*', '/'];
-    readonly private string[] Keywords = [];
-
+    readonly private string[] Keywords = ["class"];
+    
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
         bool IsHyphen = RawChar == '-';
 
@@ -54,7 +55,8 @@ class Tokenizer {
                     Pos++;
                 }
 
-                TokenQueue.Enqueue(new Token("Number", Data[Start .. Pos]));
+                string Type = Deci ? "Float" : "Integer";
+                TokenQueue.Enqueue(new Token(Type, Data[Start .. Pos]));
 
                 continue;
             }
@@ -107,7 +109,7 @@ class Lexer {
         if (File.Exists(Path))
             FileData = File.ReadAllText(Path);
         else
-            throw new Exception("Read Error - Couldn't find file"); // File does not exist
+            throw new Exception(); // File does not exist
     }
     public Lexer() { // Not using file, expects manual data later when calling Tokenize
         T = new Tokenizer();
@@ -118,13 +120,13 @@ class Lexer {
     }
     public Queue<Token> Tokenize() { // Public/Main method to use tokenizer
         if (FileData.Length <= 0)
-            throw new Exception("Read Error - Empty file"); // File existed, but was empty
+            throw new Exception(); // File existed, but was empty
 
         return T.Process(FileData);
     }
 
     public void DebugTQ(Queue<Token> TokenQueue) { // Debug TokenQueue by printing it out
         foreach(Token T in TokenQueue)
-            Console.WriteLine($"T:\n  : {T.Value}\n  : {T.Classifier}");
+            Console.WriteLine(T);
     }
 }

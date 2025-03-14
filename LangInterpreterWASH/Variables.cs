@@ -1,5 +1,5 @@
 class Variables {
-    private Dictionary<string, object> Storage; // Variable storage, duh
+    private Dictionary<string, object> Storage; // Variable storage
 
     public Variables() {
         Storage = [];
@@ -7,6 +7,10 @@ class Variables {
 
     public void Store(string Identifier, object Value) { // Public method for storing a variable
         Storage[Identifier] = Value;
+    }
+
+    public object Fetch(string Identifier) { // Public method for storing a variable
+        return Storage[Identifier];
     }
 
     public void DebugAll() { // Debugging method to just dump all the values
