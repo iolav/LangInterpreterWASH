@@ -5,37 +5,55 @@ class Evaluator() {
         }
     } 
 
-    private double Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
+    private object Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
         if (Node.Action == "Integer") {
             return int.Parse(Node.Value);
         } else if (Node.Action == "Float") {
             return float.Parse(Node.Value);
         } else if (Node.Action == "Variable" && Vars.Find(Node.Value)) {
-            return (double)Vars.Fetch(Node.Value);
+            return Vars.Fetch(Node.Value);
         }
 
         else if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            double Left = Evaluate(Node.Left, Vars);
-            double Right = Evaluate(Node.Right, Vars);
+            object Left = Evaluate(Node.Left, Vars);
+            object Right = Evaluate(Node.Right, Vars);
 
-            if (Node.Value == "+")
-                return Left + Right;
-            else if (Node.Value == "-")
-                return Left - Right;
-            else if (Node.Value == "*")
-                return Left * Right;
-            else if (Node.Value == "/")
-                return Left / Right;
+            if (Left is int LInt && Right is int RInt) {
+                return Node.Value switch {
+                    "+" => LInt + RInt,
+                    "-" => LInt - RInt,
+                    "*" => LInt * RInt,
+                    "/" => LInt / RInt,
+                    _ => throw new Exception() // Invalid op
+                };
+            }
+
+            float L = Convert.ToSingle(Left);
+            float R = Convert.ToSingle(Right);
+
+            return Node.Value switch {
+                "+" => L + R,
+                "-" => L - R,
+                "*" => L * R,
+                "/" => L / R,
+                _ => throw new Exception() // Invalid op
+            };
         }
 
         else if (Node.Action == "Negate") {
             if (Node.Left == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            return -Evaluate(Node.Left, Vars);
+            object value = Evaluate(Node.Left, Vars);
+
+            return value switch {
+                int I => -I,
+                float F => -F,
+                _ => throw new Exception() // Negating other than number
+            };
         }
 
         else if (Node.Action == "Assignment") {
