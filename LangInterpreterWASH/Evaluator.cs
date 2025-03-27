@@ -5,28 +5,28 @@ class Evaluator() {
         }
     } 
 
-    private object Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
+    private (string, object) Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
         if (Node.Action == "Integer") {
-            return int.Parse(Node.Value);
+            return (Node.Action, int.Parse(Node.Value));
         } else if (Node.Action == "Float") {
-            return float.Parse(Node.Value);
+            return (Node.Action, float.Parse(Node.Value));
         } else if (Node.Action == "Variable" && Vars.Find(Node.Value)) {
-            return Vars.Fetch(Node.Value);
+            return (Node.Action, Vars.Fetch(Node.Value));
         }
 
         else if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            object Left = Evaluate(Node.Left, Vars);
-            object Right = Evaluate(Node.Right, Vars);
+            object Left = Evaluate(Node.Left, Vars).Item2;
+            object Right = Evaluate(Node.Right, Vars).Item2;
 
             if (Left is int LInt && Right is int RInt) {
                 return Node.Value switch {
-                    "+" => LInt + RInt,
-                    "-" => LInt - RInt,
-                    "*" => LInt * RInt,
-                    "/" => LInt / RInt,
+                    "+" => ("Integer", LInt + RInt),
+                    "-" => ("Integer", LInt - RInt),
+                    "*" => ("Integer", LInt * RInt),
+                    "/" => ("Integer", LInt / RInt),
                     _ => throw new Exception() // Invalid op
                 };
             }
@@ -35,10 +35,10 @@ class Evaluator() {
             float R = Convert.ToSingle(Right);
 
             return Node.Value switch {
-                "+" => L + R,
-                "-" => L - R,
-                "*" => L * R,
-                "/" => L / R,
+                "+" => ("Float", L + R),
+                "-" => ("Float", L - R),
+                "*" => ("Float", L * R),
+                "/" => ("Float", L / R),
                 _ => throw new Exception() // Invalid op
             };
         }
@@ -47,11 +47,11 @@ class Evaluator() {
             if (Node.Left == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            object value = Evaluate(Node.Left, Vars);
+            object Value = Evaluate(Node.Left, Vars);
 
-            return value switch {
-                int I => -I,
-                float F => -F,
+            return Value switch {
+                int I => ("Integer", -I),
+                float F => ("Float", -F),
                 _ => throw new Exception() // Negating other than number
             };
         }
@@ -62,11 +62,11 @@ class Evaluator() {
 
             Vars.Store(Node.Left.Value, Evaluate(Node.Right, Vars));
 
-            return 0;
+            return ("None", 0);
         }
 
         else if (Node.Action == "Empty" || Node.Action == "Program") {
-            return 0;
+            return ("None", 0);
         }
 
         throw new Exception(); // Can happen if previous statements fail or no invalid Action
