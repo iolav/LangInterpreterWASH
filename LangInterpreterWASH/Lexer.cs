@@ -4,12 +4,12 @@ class Token(string C, string V) // To store a tokens value and associating class
     public readonly string Value = V;
 
     public override string ToString() {
-        return $"T:\n  : {Value}\n  : {Classifier}";
+        return $"Token:\n  : {Value}\n  : {Classifier}";
     }
 }
 
 class Tokenizer {
-    readonly private char[] Operators = ['+', '-', '*', '/'];
+    readonly private string[] Operators = ["+", "-", "*", "/", "and"];
     readonly private string[] Keywords = [];
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
@@ -18,7 +18,7 @@ class Tokenizer {
         bool HasNextIsInt = Pos + 1 < Data.Length && int.TryParse(Data[Pos + 1].ToString(), out _);
 
         bool HasPrevious = Pos - 1 > -1;
-        bool PrevIsOperator = HasPrevious && Operators.Contains(Data[Pos - 1]);
+        bool PrevIsOperator = HasPrevious && Operators.Contains(Data[Pos - 1].ToString());
         bool PrevIsOpenParen = HasPrevious && Data[Pos - 1] == '(';
 
         return IsHyphen && HasNextIsInt && (Pos == 0 || PrevIsOperator || PrevIsOpenParen || char.IsWhiteSpace(Data[Pos - 1]));
@@ -61,21 +61,51 @@ class Tokenizer {
                 continue;
             }
 
+            if (RawChar == '\"') { // Handle strings
+                int Start = Pos;
+
+                Pos++;
+                while (Pos < Len && Data[Pos] != '\"')
+                    Pos++;
+                Pos++;
+
+                string SubSeg = Data[Start .. Pos];
+
+                TokenQueue.Enqueue(new Token("String", SubSeg));
+
+                continue;
+            }
+            if (RawChar == '\'') { // Handle characters
+                string SubSeg = Data[Pos .. (Pos + 3)];
+
+                if (SubSeg[2] != '\'')
+                    throw new Exception(); // Char with more than one char (Ie. 'ab')
+
+                TokenQueue.Enqueue(new Token("Character", SubSeg));
+
+                Pos += 3;
+
+                continue;
+            }
+
             if (char.IsLetter(RawChar)) { // Handle letters and keywords
                 int Start = Pos;
 
                 while (Pos < Len && (char.IsLetter(Data[Pos]) || int.TryParse(Data[Pos].ToString(), out _)))
                     Pos++;
+                
                 string SubSeg = Data[Start .. Pos];
                 if (Keywords.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Keyword", SubSeg));
+                else if (SubSeg == "True" || SubSeg == "False")
+                    TokenQueue.Enqueue(new Token("Boolean", SubSeg));
                 else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
 
                 continue;
             }
 
-            if (Operators.Contains(RawChar)) { // Handle operators
+            if (Operators.Contains(Segment)) { // Handle operators
                 TokenQueue.Enqueue(new Token("Operator", Segment));
                 Pos++; continue;
             }

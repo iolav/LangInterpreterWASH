@@ -6,41 +6,62 @@ class Evaluator() {
     } 
 
     private (string, object) Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
-        if (Node.Action == "Integer") {
-            return (Node.Action, int.Parse(Node.Value));
-        } else if (Node.Action == "Float") {
-            return (Node.Action, float.Parse(Node.Value));
-        } else if (Node.Action == "Variable" && Vars.Find(Node.Value)) {
-            return (Node.Action, Vars.Fetch(Node.Value));
+        switch (Node.Action) { // Handle static values
+            case "Integer":
+                return (Node.Action, int.Parse(Node.Value));
+            case "Float":
+                return (Node.Action, float.Parse(Node.Value));
+            case "Variable" when Vars.Find(Node.Value):
+                return (Node.Action, Vars.Fetch(Node.Value));
+            case "String":
+                return (Node.Action, Node.Value[1..^1]);
+            case "Character":
+                return (Node.Action, char.Parse(Node.Value[1..^1]));
+            case "Boolean":
+                return (Node.Action, Node.Value == "True");
         }
 
-        else if (Node.Action == "Operator") {
+        if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
             object Left = Evaluate(Node.Left, Vars).Item2;
             object Right = Evaluate(Node.Right, Vars).Item2;
 
-            if (Left is int LInt && Right is int RInt) {
-                return Node.Value switch {
-                    "+" => ("Integer", LInt + RInt),
-                    "-" => ("Integer", LInt - RInt),
-                    "*" => ("Integer", LInt * RInt),
-                    "/" => ("Integer", LInt / RInt),
+            if (Left is string LStr && Right is string RStr) { // String operations
+                return ("String", Node.Value switch {
+                    "+" => LStr + RStr,
                     _ => throw new Exception() // Invalid op
-                };
+                });
+            }
+
+            if (Left is bool LBool && Right is bool RBool) {
+                return ("Boolean", Node.Value switch {
+                    "and" => LBool && RBool,
+                    _ => throw new Exception() // Invalid op
+                });
+            }
+
+            if (Left is int LInt && Right is int RInt) {
+                return ("Integer", Node.Value switch { // Integer operations
+                    "+" => LInt + RInt,
+                    "-" => LInt - RInt,
+                    "*" => LInt * RInt,
+                    "/" => LInt / RInt,
+                    _ => throw new Exception() // Invalid op
+                });
             }
 
             float L = Convert.ToSingle(Left);
             float R = Convert.ToSingle(Right);
 
-            return Node.Value switch {
-                "+" => ("Float", L + R),
-                "-" => ("Float", L - R),
-                "*" => ("Float", L * R),
-                "/" => ("Float", L / R),
+            return ("Float", Node.Value switch { // Float operations
+                "+" => L + R,
+                "-" => L - R,
+                "*" => L * R,
+                "/" => L / R,
                 _ => throw new Exception() // Invalid op
-            };
+            });
         }
 
         else if (Node.Action == "Negate") {

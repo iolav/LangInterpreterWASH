@@ -70,16 +70,14 @@ class Parser(Queue<Token> TokenQueue) {
 
             ASTNode Node = Expression();
 
-            if (Next.Value != ")")
+            if (Peek().Value != ")")
                 throw new Exception(); // Test case: "(1 + 1"
             
             Dequeue();
 
             return Node;
-        } else if (Next.Classifier == "Identifier") 
-            return new ASTNode("Variable", Dequeue().Value, null, null);
-        else if (Next.Classifier == "Keyword")
-            return new ASTNode("Keyword", Dequeue().Value, null, null);
+        } else
+            return new ASTNode(Next.Classifier, Dequeue().Value, null, null);
 
         throw new Exception(); // Gets here if no input is provided
     }
@@ -90,7 +88,7 @@ class Parser(Queue<Token> TokenQueue) {
         if (Peek().Value == "=") {
             Token AssignToken = Dequeue();
 
-            if (Node.Action != "Variable")
+            if (Node.Action != "Identifier")
                 throw new Exception();
 
             ASTNode RightHandSide = Expression();
