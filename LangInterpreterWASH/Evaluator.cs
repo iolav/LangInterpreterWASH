@@ -11,7 +11,7 @@ class Evaluator() {
                 return (Node.Action, int.Parse(Node.Value));
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
-            case "Variable" when Vars.Find(Node.Value):
+            case "Identifier" when Vars.Find(Node.Value):
                 return (Node.Action, Vars.Fetch(Node.Value));
             case "String":
                 return (Node.Action, Node.Value[1..^1]);
@@ -90,6 +90,6 @@ class Evaluator() {
             return ("None", 0);
         }
 
-        throw new Exception(); // Can happen if previous statements fail or no invalid Action
+        throw new Exception(); // Can happen if previous statements fail or no valid action (most likley)
     }
 }

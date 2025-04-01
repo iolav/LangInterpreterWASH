@@ -9,7 +9,7 @@ class Variables {
         Storage[Identifier] = (Value.Item1, Value.Item2);
     }
 
-    public object Fetch(string Identifier) { // Public method for fetching a variable
+    public (string, object) Fetch(string Identifier) { // Public method for fetching a variable
         return Storage[Identifier];
     }
 
