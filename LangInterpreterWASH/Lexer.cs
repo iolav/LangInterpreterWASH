@@ -9,7 +9,7 @@ class Token(string C, string V) // To store a tokens value and associating class
 }
 
 class Tokenizer {
-    readonly private string[] Operators = ["+", "-", "*", "/", "and"];
+    readonly private string[] Operators = ["+", "-", "*", "/", "and", "or"];
     readonly private string[] Keywords = [];
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
@@ -99,18 +99,20 @@ class Tokenizer {
                     TokenQueue.Enqueue(new Token("Keyword", SubSeg));
                 else if (SubSeg == "True" || SubSeg == "False")
                     TokenQueue.Enqueue(new Token("Boolean", SubSeg));
+                else if (Operators.Contains(SubSeg))
+                    TokenQueue.Enqueue(new Token("Operator", SubSeg));
                 else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
 
                 continue;
             }
 
-            if (Operators.Contains(Segment)) { // Handle operators
+            if (Operators.Contains(Segment)) { // Handle single char operators
                 TokenQueue.Enqueue(new Token("Operator", Segment));
                 Pos++; continue;
             }
 
-            if (RawChar == '=') {
+            if (RawChar == '=') { // Handle assignment equals
                 TokenQueue.Enqueue(new Token("Assignment", Segment));
                 Pos++; continue;
             }

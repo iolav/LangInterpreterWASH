@@ -6,6 +6,9 @@ class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to sto
 }
 
 class Parser(Queue<Token> TokenQueue) {
+    readonly private string[] Expressions = ["+", "-", "and", "or"];
+    readonly private string[] Terms = ["*", "/"];
+
     private ASTNode Statement() {
         return Assignment();
     }
@@ -20,10 +23,10 @@ class Parser(Queue<Token> TokenQueue) {
         return Roots;
     }
 
-    private ASTNode Expression() { // Handle addition and subtraction
+    private ASTNode Expression() { // Handle expressions
         ASTNode Node = Term();
 
-        while (Peek().Value == "+" || Peek().Value == "-") {
+        while (Expressions.Contains(Peek().Value)) {
             Token Operator = Dequeue();
             Node = new ASTNode(Operator.Classifier, Operator.Value, Node, Term());
         }
@@ -31,10 +34,10 @@ class Parser(Queue<Token> TokenQueue) {
         return Node;
     }
 
-    private ASTNode Term() { // Handle term
+    private ASTNode Term() { // Handle terms
         ASTNode Node = Factor();
 
-        while (Peek().Value == "*" || Peek().Value == "/") {
+        while (Terms.Contains(Peek().Value)) {
             Token Operator = Dequeue();
             Node = new ASTNode(Operator.Classifier, Operator.Value, Node, Factor());
         }

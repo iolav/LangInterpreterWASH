@@ -8,11 +8,14 @@ class Evaluator() {
     private (string, object) Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
         switch (Node.Action) { // Handle static values
             case "Integer":
-                return (Node.Action, int.Parse(Node.Value));
+                int Parsed = int.Parse(Node.Value);
+                bool Compressable = Parsed < 256 && Parsed > -1;
+                return (Compressable ? "Byte" : Node.Action, Compressable ? byte.Parse(Node.Value) : Parsed);
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
             case "Identifier" when Vars.Find(Node.Value):
-                return (Node.Action, Vars.Fetch(Node.Value));
+                (string, object) Fetched = Vars.Fetch(Node.Value);
+                return (Fetched.Item1, Fetched.Item2);
             case "String":
                 return (Node.Action, Node.Value[1..^1]);
             case "Character":
@@ -38,6 +41,7 @@ class Evaluator() {
             if (Left is bool LBool && Right is bool RBool) {
                 return ("Boolean", Node.Value switch {
                     "and" => LBool && RBool,
+                    "or" => LBool || RBool,
                     _ => throw new Exception() // Invalid op
                 });
             }
