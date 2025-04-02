@@ -34,6 +34,13 @@ class Tokenizer {
             char RawChar = Data[Pos];
             string Segment = RawChar.ToString();
 
+            if (Pos + 1 < Len && (Segment + Data[Pos + 1]).Equals("//")) {
+                while (Pos < Len && Data[Pos] != '\n')
+                    Pos++;
+
+                continue;
+            }
+
             if (string.IsNullOrWhiteSpace(Segment)) { // Ignore whitespace
                 Pos++; continue;
             }
