@@ -34,9 +34,16 @@ class Tokenizer {
             char RawChar = Data[Pos];
             string Segment = RawChar.ToString();
 
-            if (Pos + 1 < Len && (Segment + Data[Pos + 1]).Equals("//")) {
+            if (Pos + 1 < Len && (Segment + Data[Pos + 1]).Equals("//")) { // Handle single-line comments
                 while (Pos < Len && Data[Pos] != '\n')
                     Pos++;
+
+                continue;
+            }
+            if (Pos + 1 < Len && (Segment + Data[Pos + 1]).Equals("/*")) { // Handle multi-line comments
+                while (Pos < Len && Pos + 1 < Len && !Data[Pos..(Pos + 2)].Equals("*/"))
+                    Pos++;
+                Pos += 2;
 
                 continue;
             }

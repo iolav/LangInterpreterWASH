@@ -1,1 +1,8 @@
-Result = 1 + 2 //hello
+Result = 1 + 2
+
+/* Hi
+This is a multi
+line comment
+Yes */ Result2 = 4 + Result
+
+Result3 = 5 * 3
