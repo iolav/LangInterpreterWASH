@@ -11,6 +11,7 @@ class Token(string C, string V) // To store a tokens value and associating class
 class Tokenizer {
     readonly private string[] Operators = ["+", "-", "*", "/", "and", "or"];
     readonly private string[] Keywords = [];
+    readonly private string[] Types = ["int", "float", "bool", "string"];
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
         bool IsHyphen = RawChar == '-';
@@ -115,6 +116,8 @@ class Tokenizer {
                     TokenQueue.Enqueue(new Token("Boolean", SubSeg));
                 else if (Operators.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Operator", SubSeg));
+                else if (Types.Contains(SubSeg))
+                    TokenQueue.Enqueue(new Token("Type", SubSeg));
                 else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
 

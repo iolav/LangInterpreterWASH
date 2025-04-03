@@ -8,16 +8,12 @@ class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to sto
 class Parser(Queue<Token> TokenQueue) {
     readonly private string[] Expressions = ["+", "-", "and", "or"];
     readonly private string[] Terms = ["*", "/"];
-
-    private ASTNode Statement() {
-        return Assignment();
-    }
     
     public Queue<ASTNode> Parse() { // Public method to invoke parsing    
         Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            Roots.Enqueue(Statement());
+            Roots.Enqueue(Assignment());
         }
 
         return Roots;
@@ -88,13 +84,16 @@ class Parser(Queue<Token> TokenQueue) {
     private ASTNode Assignment() { // Handle variable assignments
         ASTNode Node = Expression();
 
-        if (Peek().Value == "=") {
+        if (Peek().Classifier == "Type") {
+            Token TypeToken = Dequeue();
             Token AssignToken = Dequeue();
 
             if (Node.Action != "Identifier")
                 throw new Exception();
 
             ASTNode RightHandSide = Expression();
+
+            //Node.Classifier = TypeToken.Value;
 
             return new ASTNode("Assignment", AssignToken.Value, Node, RightHandSide);
         }
