@@ -82,10 +82,14 @@ class Parser(Queue<Token> TokenQueue) {
     }
 
     private ASTNode Assignment() { // Handle variable assignments
+        Token? TypeToken = null;
+        if (Peek().Classifier == "Type") {
+            TypeToken = Dequeue();
+        }
+
         ASTNode Node = Expression();
 
-        if (Peek().Classifier == "Type") {
-            Token TypeToken = Dequeue();
+        if (Peek().Classifier == "Assignment") {
             Token AssignToken = Dequeue();
 
             if (Node.Action != "Identifier")
@@ -93,7 +97,8 @@ class Parser(Queue<Token> TokenQueue) {
 
             ASTNode RightHandSide = Expression();
 
-            //Node.Classifier = TypeToken.Value;
+            if (TypeToken != null)
+                Node.Action = TypeToken.Value;
 
             return new ASTNode("Assignment", AssignToken.Value, Node, RightHandSide);
         }
