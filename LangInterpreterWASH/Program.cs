@@ -1,4 +1,4 @@
-﻿Lexer Lex = new(@"C:\Users\treys\Desktop\LangInterpreterWASH\test.wash");
+﻿Lexer Lex = new(@"E:\Projects\LangInterpreterWASH\test.wash");
 Queue<Token> TokenQueue = Lex.Tokenize();
 //Lex.DebugTQ(TokenQueue);
 

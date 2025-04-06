@@ -1,3 +1,5 @@
+using System.Reflection.PortableExecutable;
+
 class Token(string C, string V) // To store a tokens value and associating classifier
 {
     public readonly string Classifier = C;
@@ -11,7 +13,13 @@ class Token(string C, string V) // To store a tokens value and associating class
 class Tokenizer {
     readonly private string[] Operators = ["+", "-", "*", "/", "and", "or"];
     readonly private string[] Keywords = [];
-    readonly private string[] Types = ["int", "float", "bool", "string"];
+
+    readonly Dictionary<string, string> Types = new(){
+        {"int", "Integer"},
+        {"float", "Float"},
+        {"bool", "Boolean"},
+        {"string", "String"},
+    };
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
         bool IsHyphen = RawChar == '-';
@@ -116,8 +124,8 @@ class Tokenizer {
                     TokenQueue.Enqueue(new Token("Boolean", SubSeg));
                 else if (Operators.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Operator", SubSeg));
-                else if (Types.Contains(SubSeg))
-                    TokenQueue.Enqueue(new Token("Type", SubSeg));
+                else if (Types.ContainsKey(SubSeg))
+                    TokenQueue.Enqueue(new Token("Type", Types[SubSeg]));
                 else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
 

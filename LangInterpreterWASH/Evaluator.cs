@@ -85,7 +85,12 @@ class Evaluator() {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            Vars.Store(Node.Left.Value, Evaluate(Node.Right, Vars));
+            (string, object) RightNode = Evaluate(Node.Right, Vars);
+
+            if (RightNode.Item1 != Node.Left.Action)
+                throw new Exception(); // Type mismatch
+
+            Vars.Store(Node.Left.Value, RightNode);
 
             return ("None", 0);
         }
