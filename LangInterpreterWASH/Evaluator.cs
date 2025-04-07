@@ -1,20 +1,20 @@
+using ValuePair = (string, object);
+
 class Evaluator() {
-    public void StartEval(Queue<ASTNode> Roots, Variables Vars) { // Public method to evaluate all root nodes
+    public void StartEval(Queue<ASTNode> Roots, Enviornment Env) { // Public method to evaluate all root nodes
         while (Roots.Count > 0) {
-            Evaluate(Roots.Dequeue(), Vars);
+            Evaluate(Roots.Dequeue(), Env);
         }
     } 
 
-    private (string, object) Evaluate(ASTNode Node, Variables Vars) { // Start at top node and recursivly evaluate each one
+    private ValuePair Evaluate(ASTNode Node, Enviornment Env) { // Start at top node and recursivly evaluate each one
         switch (Node.Action) { // Handle static values
             case "Integer":
-                int Parsed = int.Parse(Node.Value);
-                bool Compressable = Parsed < 256 && Parsed > -1;
-                return (Compressable ? "Byte" : Node.Action, Compressable ? byte.Parse(Node.Value) : Parsed);
+                return (Node.Action, int.Parse(Node.Value));
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
-            case "Identifier" when Vars.Find(Node.Value):
-                (string, object) Fetched = Vars.Fetch(Node.Value);
+            case "Identifier" when Env.Find(Node.Value):
+                ValuePair Fetched = Env.Fetch(Node.Value);
                 return (Fetched.Item1, Fetched.Item2);
             case "String":
                 return (Node.Action, Node.Value[1..^1]);
@@ -22,14 +22,17 @@ class Evaluator() {
                 return (Node.Action, char.Parse(Node.Value[1..^1]));
             case "Boolean":
                 return (Node.Action, Node.Value == "True");
+            case "Byte":
+                bool CanParse = byte.TryParse(Node.Value, out byte Parsed);
+                return (CanParse ? Node.Action : "Integer", CanParse ? Parsed : int.Parse(Node.Action));
         }
 
         if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            object Left = Evaluate(Node.Left, Vars).Item2;
-            object Right = Evaluate(Node.Right, Vars).Item2;
+            object Left = Evaluate(Node.Left, Env).Item2;
+            object Right = Evaluate(Node.Right, Env).Item2;
 
             if (Left is string LStr && Right is string RStr) { // String operations
                 return ("String", Node.Value switch {
@@ -72,7 +75,7 @@ class Evaluator() {
             if (Node.Left == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            object Value = Evaluate(Node.Left, Vars);
+            object Value = Evaluate(Node.Left, Env);
 
             return Value switch {
                 int I => ("Integer", -I),
@@ -85,12 +88,17 @@ class Evaluator() {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            (string, object) RightNode = Evaluate(Node.Right, Vars);
+            ValuePair RightNode = Evaluate(Node.Right, Env);
 
-            if (RightNode.Item1 != Node.Left.Action)
-                throw new Exception(); // Type mismatch
+            bool UsingByte = RightNode.Item1 == "Integer" && Node.Left.Action == "Byte"; // Check for byte definition
+            
+            if (RightNode.Item1 != Node.Left.Action && !UsingByte)
+                throw new Exception(); // Type mismatch or missing type
 
-            Vars.Store(Node.Left.Value, RightNode);
+            if (UsingByte)
+                RightNode.Item1 = "Byte";
+
+            Env.Store(Node.Left.Value, RightNode);
 
             return ("None", 0);
         }

@@ -19,6 +19,7 @@ class Tokenizer {
         {"float", "Float"},
         {"bool", "Boolean"},
         {"string", "String"},
+        {"byte", "Byte"}
     };
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
@@ -177,7 +178,7 @@ class Lexer {
     }
     public Queue<Token> Tokenize() { // Public/Main method to use tokenizer
         if (FileData.Length <= 0)
-            throw new Exception(); // File existed, but was empty
+            return new();
 
         return T.Process(FileData);
     }

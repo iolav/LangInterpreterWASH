@@ -8,7 +8,9 @@ Parser Parse = new(TokenQueue);
 Queue<ASTNode> Roots = Parse.Parse();
 Parse.DebugRoots(Roots);
 
+Enviornment GlobalEnv = new();
+
 Evaluator Eval = new();
-Variables Vars = new();
-Eval.StartEval(Roots, Vars);
-Vars.DebugAll();
+Eval.StartEval(Roots, GlobalEnv);
+
+GlobalEnv.DebugAll();

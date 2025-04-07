@@ -1,1 +1,1 @@
-int Hello = True
+byte hello = 1000
