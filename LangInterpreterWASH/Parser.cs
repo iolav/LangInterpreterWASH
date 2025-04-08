@@ -1,8 +1,21 @@
-class ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // Node class to store things for the AST
-    public string Action = A;
-    public string Value = V;
-    public ASTNode? Left = L;
-    public ASTNode? Right = R;
+class ASTNode { // Node class to store things for the AST
+    public string Action;
+    public string Value;
+    public ASTNode? Left;
+    public ASTNode? Right;
+    public List<ASTNode> Collection = [];
+
+    public ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // For making a normal node
+        Action = A;
+        Value = V;
+        Left = L;
+        Right = R;
+    }
+
+    public ASTNode() { // For making a block node
+        Action = "Block";
+        Value = "";
+    }
 }
 
 class Parser(Queue<Token> TokenQueue) {
@@ -13,7 +26,7 @@ class Parser(Queue<Token> TokenQueue) {
         Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            Roots.Enqueue(Assignment());
+            Roots.Enqueue(Conditional());
         }
 
         return Roots;
@@ -93,17 +106,35 @@ class Parser(Queue<Token> TokenQueue) {
             Token AssignToken = Dequeue();
 
             if (Node.Action != "Identifier")
-                throw new Exception();
+                throw new Exception(); // Invalid identifier
 
             ASTNode RightHandSide = Expression();
 
-            if (TypeToken != null)
+            if (TypeToken != null) {
                 Node.Action = TypeToken.Value;
+
+                if (TypeToken.Value == "Byte" && RightHandSide.Action == "Integer")
+                    RightHandSide.Action = "Byte";
+            }
 
             return new ASTNode("Assignment", AssignToken.Value, Node, RightHandSide);
         }
 
         return Node;
+    }
+
+    private ASTNode Conditional() {
+        Token Keyword = Dequeue();
+
+        ASTNode Condition = Expression();
+
+        Dequeue();
+
+        ASTNode Block = new();
+        while (TokenQueue.Count > 0)
+            Block.Collection.Add(Assignment());
+
+        return new ASTNode("Conditional", Keyword.Value, Condition, Block);
     }
 
     private Token Peek() { // DRY method for peeking
@@ -133,5 +164,10 @@ class Parser(Queue<Token> TokenQueue) {
             DebugNodes(Node.Left, Indent + 4);
         if (Node.Right != null)
             DebugNodes(Node.Right, Indent + 4);
+        if (Node.Collection.Count > 0)
+            foreach (ASTNode ChildNode in Node.Collection)
+            {
+                DebugNodes(ChildNode, Indent + 4);
+            }
     }
 }

@@ -12,13 +12,14 @@ class Token(string C, string V) // To store a tokens value and associating class
 
 class Tokenizer {
     readonly private string[] Operators = ["+", "-", "*", "/", "and", "or"];
-    readonly private string[] Keywords = [];
+    readonly private string[] Keywords = ["if", "then"];
 
     readonly Dictionary<string, string> Types = new(){
         {"int", "Integer"},
         {"float", "Float"},
         {"bool", "Boolean"},
         {"string", "String"},
+        {"char", "Character"},
         {"byte", "Byte"}
     };
     

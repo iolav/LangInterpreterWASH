@@ -23,8 +23,19 @@ class Evaluator() {
             case "Boolean":
                 return (Node.Action, Node.Value == "True");
             case "Byte":
-                bool CanParse = byte.TryParse(Node.Value, out byte Parsed);
-                return (CanParse ? Node.Action : "Integer", CanParse ? Parsed : int.Parse(Node.Action));
+                if (byte.TryParse(Node.Value, out byte Parsed))
+                    return (Node.Action, Parsed);
+                else
+                    throw new Exception(); // Byte out of range
+        }
+
+        if (Node.Action == "Conditional") {Evaluate(Node.Right, Env);}
+
+        if (Node.Action == "Block") {
+            foreach (ASTNode ChildNode in Node.Collection)
+            {
+                Evaluate(ChildNode, Env);
+            }
         }
 
         if (Node.Action == "Operator") {
@@ -49,8 +60,12 @@ class Evaluator() {
                 });
             }
 
-            if (Left is int LInt && Right is int RInt) {
-                return ("Integer", Node.Value switch { // Integer operations
+            if ((Left is int or byte) && (Right is int or byte))
+            {
+                int LInt = Left is byte v1 ? v1 : (int)Left;
+                int RInt = Right is byte v ? v : (int)Right;
+
+                return ("Integer", Node.Value switch {
                     "+" => LInt + RInt,
                     "-" => LInt - RInt,
                     "*" => LInt * RInt,
@@ -89,23 +104,17 @@ class Evaluator() {
                 throw new Exception(); // Shouldnt ever get here
 
             ValuePair RightNode = Evaluate(Node.Right, Env);
-
-            bool UsingByte = RightNode.Item1 == "Integer" && Node.Left.Action == "Byte"; // Check for byte definition
             
-            if (RightNode.Item1 != Node.Left.Action && !UsingByte)
+            if ((RightNode.Item1 != Node.Left.Action) && !Env.Find(Node.Left.Value))
                 throw new Exception(); // Type mismatch or missing type
-
-            if (UsingByte)
-                RightNode.Item1 = "Byte";
 
             Env.Store(Node.Left.Value, RightNode);
 
             return ("None", 0);
         }
 
-        else if (Node.Action == "Empty" || Node.Action == "Program") {
+        else if (Node.Action == "Empty")
             return ("None", 0);
-        }
 
         throw new Exception(); // Can happen if previous statements fail or no valid action (most likley)
     }
