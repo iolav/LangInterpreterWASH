@@ -29,14 +29,14 @@ class Evaluator() {
                     throw new Exception(); // Byte out of range
         }
 
-        if (Node.Action == "Conditional") {Evaluate(Node.Right, Env);}
+        /*if (Node.Action == "Conditional") {Evaluate(Node.Right, Env);}
 
         if (Node.Action == "Block") {
             foreach (ASTNode ChildNode in Node.Collection)
             {
                 Evaluate(ChildNode, Env);
             }
-        }
+        }*/
 
         if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)

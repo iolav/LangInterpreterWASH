@@ -26,7 +26,7 @@ class Parser(Queue<Token> TokenQueue) {
         Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            Roots.Enqueue(Conditional());
+            Roots.Enqueue(Assignment());//Conditional());
         }
 
         return Roots;

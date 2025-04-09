@@ -1,2 +1,4 @@
-if True or False then
-    bool Hi = False
+int x = 1
+int y = 2
+
+float z = x / y
