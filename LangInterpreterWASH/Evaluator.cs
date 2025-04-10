@@ -75,13 +75,14 @@ class Evaluator() {
                 int LInt = Left is byte v1 ? v1 : (int)Left;
                 int RInt = Right is byte v ? v : (int)Right;
 
-                return ("Integer", Node.Value switch {
-                    "+" => LInt + RInt,
-                    "-" => LInt - RInt,
-                    "*" => LInt * RInt,
-                    "/" => LInt / RInt,
+                return Node.Value switch {
+                    "+" => ("Integer", LInt + RInt),
+                    "-" => ("Integer", LInt - RInt),
+                    "*" => ("Integer", LInt * RInt),
+                    "/" => ("Integer", LInt / RInt),
+                    "==" => ("Boolean", LInt == RInt),
                     _ => throw new Exception() // Invalid op
-                });
+                };
             }
 
             float L = Convert.ToSingle(Left);

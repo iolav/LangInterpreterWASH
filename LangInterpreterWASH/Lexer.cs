@@ -1,5 +1,3 @@
-using System.Reflection.PortableExecutable;
-
 class Token(string C, string V) // To store a tokens value and associating classifier
 {
     public readonly string Classifier = C;
@@ -49,13 +47,13 @@ class Tokenizer {
             char RawChar = Data[Pos];
             string Segment = RawChar.ToString();
 
-            if (Pos + 1 < Len && (Segment + Data[Pos + 1]).Equals("//")) { // Handle single-line comments
+            if (Pos + 1 < Len && (Segment + Data[Pos + 1]) == "//") { // Handle single-line comments
                 while (Pos < Len && Data[Pos] != '\n')
                     Pos++;
 
                 continue;
             }
-            if (Pos + 1 < Len && (Segment + Data[Pos + 1]).Equals("/*")) { // Handle multi-line comments
+            if (Pos + 1 < Len && (Segment + Data[Pos + 1]) == "/*") { // Handle multi-line comments
                 while (Pos < Len && Pos + 1 < Len && !Data[Pos..(Pos + 2)].Equals("*/"))
                     Pos++;
                 Pos += 2;
@@ -145,13 +143,22 @@ class Tokenizer {
                 Pos++; continue;
             }
 
-            if (RawChar == '=') { // Handle assignment equals
+            bool NextIsEquals = Pos + 1 < Len && Segment + Data[Pos + 1] == "==";
+            if (RawChar == '=' && !NextIsEquals) { // Handle assignment equals
                 TokenQueue.Enqueue(new Token("Assignment", Segment));
                 Pos++; continue;
+            } else if (NextIsEquals) {
+                TokenQueue.Enqueue(new Token("Operator", "=="));
+                Pos += 2; continue;
             }
 
             if (RawChar == '(' || RawChar == ')') { // Handle parenthesis
                 TokenQueue.Enqueue(new Token("Parenthesis", Segment));
+                Pos++; continue;
+            }
+
+            if (RawChar == '{' || RawChar == '}') {
+                TokenQueue.Enqueue(new Token("Brace", Segment));
                 Pos++; continue;
             }
 

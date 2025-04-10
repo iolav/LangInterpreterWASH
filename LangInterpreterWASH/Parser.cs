@@ -19,7 +19,7 @@ class ASTNode { // Node class to store things for the AST
 }
 
 class Parser(Queue<Token> TokenQueue) {
-    readonly private string[] Expressions = ["+", "-", "and", "or"];
+    readonly private string[] Expressions = ["+", "-", "and", "or", "=="];
     readonly private string[] Terms = ["*", "/"];
     
     public Queue<ASTNode> Parse() { // Public method to invoke parsing    
@@ -135,9 +135,13 @@ class Parser(Queue<Token> TokenQueue) {
 
         ASTNode Condition = Expression();
 
+        Dequeue(); // Consume opening brace
+
         ASTNode Block = new();
-        while (TokenQueue.Count > 0)
+        while (TokenQueue.Count > 0 && Peek().Value != "}")
             Block.Collection.Add(Statement());
+
+        Dequeue(); // Consume closing brace
 
         return new ASTNode("Conditional", Keyword.Value, Condition, Block);
     }

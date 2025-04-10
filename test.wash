@@ -1,1 +1,1 @@
-bool Test = "hello" == "hello"
+bool Test = 1 == 2
