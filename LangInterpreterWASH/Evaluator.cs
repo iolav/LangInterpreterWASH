@@ -56,10 +56,11 @@ class Evaluator() {
             object Right = Evaluate(Node.Right, Env).Item2;
 
             if (Left is string LStr && Right is string RStr) { // String operations
-                return ("String", Node.Value switch {
-                    "+" => LStr + RStr,
+                return Node.Value switch {
+                    "+" => ("String", LStr + RStr),
+                    "==" => ("Boolean", LStr == RStr),
                     _ => throw new Exception() // Invalid op
-                });
+                };
             }
 
             if (Left is bool LBool && Right is bool RBool) {
