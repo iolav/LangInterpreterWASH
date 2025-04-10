@@ -12,7 +12,11 @@ class Token(string C, string V) // To store a tokens value and associating class
 
 class Tokenizer {
     readonly private string[] Operators = ["+", "-", "*", "/", "and", "or"];
-    readonly private string[] Keywords = ["if", "then"];
+
+    readonly private string[] GenaricKeywords = ["then"];
+    readonly Dictionary<string, string> SpecialKeywords = new(){
+        {"if", "Conditional"}
+    };
 
     readonly Dictionary<string, string> Types = new(){
         {"int", "Integer"},
@@ -120,8 +124,10 @@ class Tokenizer {
                     Pos++;
                 
                 string SubSeg = Data[Start .. Pos];
-                if (Keywords.Contains(SubSeg))
+                if (GenaricKeywords.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Keyword", SubSeg));
+                else if (SpecialKeywords.ContainsKey(SubSeg))
+                    TokenQueue.Enqueue(new Token(SpecialKeywords[SubSeg], SubSeg));
                 else if (SubSeg == "True" || SubSeg == "False")
                     TokenQueue.Enqueue(new Token("Boolean", SubSeg));
                 else if (Operators.Contains(SubSeg))

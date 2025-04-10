@@ -26,10 +26,17 @@ class Parser(Queue<Token> TokenQueue) {
         Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            Roots.Enqueue(Assignment());//Conditional());
+            Roots.Enqueue(Statement());
         }
 
         return Roots;
+    }
+
+    private ASTNode Statement() {
+        if (Peek().Classifier == "Conditional")
+            return Conditional();
+        else
+            return Assignment();
     }
 
     private ASTNode Expression() { // Handle expressions
@@ -128,11 +135,9 @@ class Parser(Queue<Token> TokenQueue) {
 
         ASTNode Condition = Expression();
 
-        Dequeue();
-
         ASTNode Block = new();
         while (TokenQueue.Count > 0)
-            Block.Collection.Add(Assignment());
+            Block.Collection.Add(Statement());
 
         return new ASTNode("Conditional", Keyword.Value, Condition, Block);
     }

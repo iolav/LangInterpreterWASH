@@ -1,4 +1,1 @@
-int x = 1
-int y = 2
-
-float z = x / y
+bool Test = "hello" == "hello"

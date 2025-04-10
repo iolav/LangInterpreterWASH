@@ -29,14 +29,24 @@ class Evaluator() {
                     throw new Exception(); // Byte out of range
         }
 
-        /*if (Node.Action == "Conditional") {Evaluate(Node.Right, Env);}
+        if (Node.Action == "Conditional") {
+            if (Node.Left == null || Node.Right == null)
+                throw new Exception(); // Shouldnt ever get here
+
+            if ((bool)Evaluate(Node.Left, Env).Item2)
+                Evaluate(Node.Right, Env);
+            
+            return ("None", 0);
+        }
 
         if (Node.Action == "Block") {
             foreach (ASTNode ChildNode in Node.Collection)
             {
                 Evaluate(ChildNode, Env);
             }
-        }*/
+
+            return ("None", 0);
+        }
 
         if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
@@ -116,6 +126,6 @@ class Evaluator() {
         else if (Node.Action == "Empty")
             return ("None", 0);
 
-        throw new Exception(); // Can happen if previous statements fail or no valid action (most likley)
+        throw new Exception(); // Can happen if no valid action
     }
 }
