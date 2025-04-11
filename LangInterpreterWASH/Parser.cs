@@ -28,6 +28,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
     readonly private string[] Terms = ["*", "/"];
 
     private Enviornment GlobalEnv = GE;
+    private Enviornment WorkingEnv = GE;
     
     public Queue<ASTNode> Parse() { // Public method to invoke parsing    
         Queue<ASTNode> Roots = [];
@@ -37,6 +38,11 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         }
 
         return Roots;
+    }
+
+    private void CheckExpected(string Expected) {
+        if (Dequeue().Value != Expected)
+            throw new Exception();
     }
 
     private ASTNode Statement() {
@@ -142,16 +148,20 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         ASTNode Condition = Expression();
 
-        if (Dequeue().Value != "then")
-            throw new Exception(); // Missing "then" keyword
+        CheckExpected("then");
+        CheckExpected("{");
 
-        Enviornment LocalEnv = new(GlobalEnv);
-        ASTNode Block = new(LocalEnv);
+        Enviornment LocalEnv = new(WorkingEnv);
+        WorkingEnv = LocalEnv;
+
+        ASTNode Block = new(WorkingEnv);
         
         while (TokenQueue.Count > 0 && Peek().Value != "}")
             Block.Collection.Add(Statement());
 
-        Dequeue(); // Consume closing brace
+        CheckExpected("}");
+
+        WorkingEnv = LocalEnv.Parent ?? GlobalEnv;
 
         return new ASTNode("Conditional", Keyword.Value, Condition, Block);
     }

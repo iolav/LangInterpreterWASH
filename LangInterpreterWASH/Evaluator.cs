@@ -51,7 +51,7 @@ class Evaluator(Enviornment GE) {
                 Evaluate(ChildNode);
             }
 
-            WorkingEnv = GlobalEnv;
+            WorkingEnv = WorkingEnv.Parent ?? GlobalEnv;
 
             return ("None", 0);
         }
