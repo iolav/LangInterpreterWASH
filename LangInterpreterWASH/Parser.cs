@@ -4,23 +4,30 @@ class ASTNode { // Node class to store things for the AST
     public ASTNode? Left;
     public ASTNode? Right;
     public List<ASTNode> Collection = [];
+    public Enviornment? Env;
 
     public ASTNode(string A, string V, ASTNode? L, ASTNode? R) { // For making a normal node
         Action = A;
         Value = V;
         Left = L;
         Right = R;
+
+        Env = null;
     }
 
-    public ASTNode() { // For making a block node
+    public ASTNode(Enviornment E) { // For making a block node
         Action = "Block";
         Value = "";
+
+        Env = E;
     }
 }
 
-class Parser(Queue<Token> TokenQueue) {
+class Parser(Queue<Token> TokenQueue, Enviornment GE) {
     readonly private string[] Expressions = ["+", "-", "and", "or", "=="];
     readonly private string[] Terms = ["*", "/"];
+
+    private Enviornment GlobalEnv = GE;
     
     public Queue<ASTNode> Parse() { // Public method to invoke parsing    
         Queue<ASTNode> Roots = [];

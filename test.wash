@@ -1,23 +1,5 @@
-int Num1 = 3
-int Num2 = 4
-
-bool Test = True
-bool Test2 = False
-
-string What = "Hello"
-string Hi = "Hel" + "lo"
-
-Num1 = Num1 + 1
-
-if (Test or Test2) and (What == Hi) {
-    string End = ", "
-
-    Test2 = Test
-
-    bool Check = Num1 == Num2
-    if Test2 and Check {
-        End = End + "World!"
-    }
-
-    string Result = Hi + End
+if True {
+    int Test = 1
 }
+
+Test = 2
