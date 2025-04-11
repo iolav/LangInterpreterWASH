@@ -142,7 +142,8 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         ASTNode Condition = Expression();
 
-        Dequeue(); // Consume opening brace
+        if (Dequeue().Value != "then")
+            throw new Exception(); // Missing "then" keyword
 
         Enviornment LocalEnv = new(GlobalEnv);
         ASTNode Block = new(LocalEnv);
