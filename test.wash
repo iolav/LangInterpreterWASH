@@ -1,5 +1,3 @@
 if True {
     int Test = 1
 }
-
-Test = 2

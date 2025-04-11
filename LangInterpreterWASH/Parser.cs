@@ -144,7 +144,9 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         Dequeue(); // Consume opening brace
 
-        ASTNode Block = new();
+        Enviornment LocalEnv = new(GlobalEnv);
+        ASTNode Block = new(LocalEnv);
+        
         while (TokenQueue.Count > 0 && Peek().Value != "}")
             Block.Collection.Add(Statement());
 
@@ -180,10 +182,11 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             DebugNodes(Node.Left, Indent + 4);
         if (Node.Right != null)
             DebugNodes(Node.Right, Indent + 4);
-        if (Node.Collection.Count > 0)
+        if (Node.Collection.Count > 0) {
             foreach (ASTNode ChildNode in Node.Collection)
             {
                 DebugNodes(ChildNode, Indent + 4);
             }
+        }
     }
 }
