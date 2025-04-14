@@ -1,5 +1,9 @@
-if 1 > 2 then {
-    bool Hi = True
-} else {
+int test = 5
+
+if test < 6 then {
     bool Hello = False
+
+    if test == 5 then {
+        Hello = True
+    }
 }

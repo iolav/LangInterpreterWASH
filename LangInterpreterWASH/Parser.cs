@@ -154,9 +154,16 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         Token Keyword = Dequeue();
         ASTNode Condition;
 
-        if (Keyword.Value == "else" && PreviousRoot != null && PreviousRoot.Left != null) {
+        if (Keyword.Value == "else" && Peek().Value != "if" && PreviousRoot != null && PreviousRoot.Left != null)
             Condition = PreviousRoot.Left;
-        } else {
+        else if (Keyword.Value == "else" && PreviousRoot == null)
+            throw new Exception();
+        else {
+            Console.WriteLine(Peek().Value);
+            if (Peek().Value == "if") {
+                Keyword = Dequeue();
+            }
+
             Condition = Expression();
 
             CheckExpected("then"); 

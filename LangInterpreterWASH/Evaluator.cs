@@ -36,7 +36,8 @@ class Evaluator(Enviornment GE) {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
-            if ((bool)Evaluate(Node.Left).Item2)
+            bool Condition = (bool)Evaluate(Node.Left).Item2;
+            if ((Condition && Node.Value == "if") || (!Condition && Node.Value == "else"))
                 Evaluate(Node.Right);
             
             return ("None", 0);
@@ -140,7 +141,6 @@ class Evaluator(Enviornment GE) {
 
         else if (Node.Action == "Empty")
             return ("None", 0);
-
         throw new Exception(); // Can happen if no valid action
     }
 }
