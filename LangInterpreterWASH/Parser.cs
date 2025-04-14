@@ -24,17 +24,24 @@ class ASTNode { // Node class to store things for the AST
 }
 
 class Parser(Queue<Token> TokenQueue, Enviornment GE) {
-    readonly private string[] Expressions = ["+", "-", "and", "or", "=="];
-    readonly private string[] Terms = ["*", "/"];
+    readonly private Dictionary<string, int> Precedence = new() {
+        {"/", 7},
+        {"*", 6},
+        {"+", 5},
+        {"-", 4},
+        {">", 3}, {"<", 3}, {"==", 3},
+        {"and", 2},
+        {"or", 1}
+    };
 
-    private Enviornment GlobalEnv = GE;
+    readonly private Enviornment GlobalEnv = GE;
     private Enviornment WorkingEnv = GE;
     
     public Queue<ASTNode> Parse() { // Public method to invoke parsing    
         Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            Roots.Enqueue(Statement());
+            Roots.Enqueue(Statement(Roots.Count > 0 ? Roots.Peek() : null));
         }
 
         return Roots;
@@ -45,32 +52,32 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             throw new Exception();
     }
 
-    private ASTNode Statement() {
-        if (Peek().Classifier == "Conditional")
-            return Conditional();
+    private ASTNode Statement(ASTNode? PreviousRoot) {
+        Token Next = Peek();
+
+        if (Next.Classifier == "Conditional")
+            if (Next.Value == "else")
+                return Conditional(PreviousRoot);
+            else
+                return Conditional(PreviousRoot);
         else
             return Assignment();
     }
 
-    private ASTNode Expression() { // Handle expressions
-        ASTNode Node = Term();
-
-        while (Expressions.Contains(Peek().Value)) {
-            Token Operator = Dequeue();
-            Node = new ASTNode(Operator.Classifier, Operator.Value, Node, Term());
-        }
-
-        return Node;
-    }
-
-    private ASTNode Term() { // Handle terms
+    private ASTNode Expression(int MinPrecedence = 0) { // Handle expressions
         ASTNode Node = Factor();
 
-        while (Terms.Contains(Peek().Value)) {
-            Token Operator = Dequeue();
-            Node = new ASTNode(Operator.Classifier, Operator.Value, Node, Factor());
+        while (TokenQueue.Count > 0 && Precedence.ContainsKey(Peek().Value)
+            && Precedence[Peek().Value] >= MinPrecedence) {
+            
+            Token Op = Dequeue();
+            int Priority = Precedence[Op.Value];
+
+            ASTNode RightNode = Expression(Priority + 1);
+
+            Node = new(Op.Classifier, Op.Value, Node, RightNode);
         }
-        
+
         return Node;
     }
 
@@ -143,12 +150,18 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         return Node;
     }
 
-    private ASTNode Conditional() {
+    private ASTNode Conditional(ASTNode? PreviousRoot) {
         Token Keyword = Dequeue();
+        ASTNode Condition;
 
-        ASTNode Condition = Expression();
+        if (Keyword.Value == "else" && PreviousRoot != null && PreviousRoot.Left != null) {
+            Condition = PreviousRoot.Left;
+        } else {
+            Condition = Expression();
 
-        CheckExpected("then");
+            CheckExpected("then"); 
+        }
+
         CheckExpected("{");
 
         Enviornment LocalEnv = new(WorkingEnv);
@@ -157,7 +170,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         ASTNode Block = new(WorkingEnv);
         
         while (TokenQueue.Count > 0 && Peek().Value != "}")
-            Block.Collection.Add(Statement());
+            Block.Collection.Add(Statement(PreviousRoot));
 
         CheckExpected("}");
 

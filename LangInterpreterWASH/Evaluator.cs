@@ -1,7 +1,7 @@
 using ValuePair = (string, object);
 
 class Evaluator(Enviornment GE) {
-    private Enviornment GlobalEnv = GE;
+    readonly private Enviornment GlobalEnv = GE;
     private Enviornment WorkingEnv = GE;
 
     public void StartEval(Queue<ASTNode> Roots) { // Public method to evaluate all root nodes
@@ -89,7 +89,10 @@ class Evaluator(Enviornment GE) {
                     "-" => ("Integer", LInt - RInt),
                     "*" => ("Integer", LInt * RInt),
                     "/" => ("Integer", LInt / RInt),
+
                     "==" => ("Boolean", LInt == RInt),
+                    ">" => ("Boolean", LInt > RInt),
+                    "<" => ("Boolean", LInt < RInt),
                     _ => throw new Exception() // Invalid op
                 };
             }
@@ -97,13 +100,15 @@ class Evaluator(Enviornment GE) {
             float L = Convert.ToSingle(Left);
             float R = Convert.ToSingle(Right);
 
-            return ("Float", Node.Value switch { // Float operations
-                "+" => L + R,
-                "-" => L - R,
-                "*" => L * R,
-                "/" => L / R,
-                _ => throw new Exception() // Invalid op
-            });
+            return Node.Value switch {
+                    "+" => ("Float", L + R),
+                    "-" => ("Float", L - R),
+                    "*" => ("Float", L * R),
+                    "/" => ("Float", L / R),
+
+                    "==" => ("Boolean", L == R),
+                    _ => throw new Exception() // Invalid op
+                };
         }
 
         else if (Node.Action == "Negate") {

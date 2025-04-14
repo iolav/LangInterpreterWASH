@@ -1,1 +1,5 @@
-bool test = "hello" == "hello"
+if 1 > 2 then {
+    bool Hi = True
+} else {
+    bool Hello = False
+}
