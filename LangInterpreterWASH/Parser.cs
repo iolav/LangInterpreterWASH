@@ -77,9 +77,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
     private ASTNode Expression(int MinPrecedence = 0) { // Handle expressions
         ASTNode Node = Factor();
 
-        while (TokenQueue.Count > 0 && Precedence.ContainsKey(Peek().Value)
-            && Precedence[Peek().Value] >= MinPrecedence) {
-            
+        while (TokenQueue.Count > 0 && Precedence.ContainsKey(Peek().Value) && Precedence[Peek().Value] >= MinPrecedence) {
             Token Op = Dequeue();
             int Priority = Precedence[Op.Value];
 
@@ -164,16 +162,12 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         Token Keyword = Dequeue();
         ASTNode? Condition = null;
 
-        if (Keyword.Value == "if") {
-            Condition = Expression();
+        if (Keyword.Value == "if" || (Keyword.Value == "else" && Peek().Value == "if")) {
+            if (Keyword.Value == "else")
+                Dequeue();
 
+            Condition = Expression();
             CheckExpected("then");
-        } else if (Keyword.Value == "else" && Peek().Value == "if") {
-            Dequeue();
-
-            Condition = Expression();
-
-            Console.WriteLine(Condition.Value);
         }
 
         CheckExpected("{");

@@ -1,11 +1,1 @@
-int Test = 6
-
-if Test / 2 == 2 then {
-    bool Output = "Hello!"
-} else if Test + 1 == 8 then {
-    bool Output = "Hi!"
-} else if Test * 2 == 16 then {
-    bool Output = "Hola!"
-} else {
-    bool Output = "Bye!"
-}
+int[] array = [1, 2, 3]

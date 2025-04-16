@@ -23,7 +23,7 @@ class Tokenizer {
         {"bool", "Boolean"},
         {"string", "String"},
         {"char", "Character"},
-        {"byte", "Byte"}
+        {"byte", "Byte"},
     };
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not
@@ -119,7 +119,7 @@ class Tokenizer {
             if (char.IsLetter(RawChar)) { // Handle letters and keywords
                 int Start = Pos;
 
-                while (Pos < Len && (char.IsLetter(Data[Pos]) || int.TryParse(Data[Pos].ToString(), out _)))
+                while (Pos < Len && (char.IsLetterOrDigit(Data[Pos]) || Data[Pos] == '[' || Data[Pos] == ']'))
                     Pos++;
                 
                 string SubSeg = Data[Start .. Pos];
@@ -131,9 +131,15 @@ class Tokenizer {
                     TokenQueue.Enqueue(new Token("Boolean", SubSeg));
                 else if (Operators.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Operator", SubSeg));
-                else if (Types.ContainsKey(SubSeg))
-                    TokenQueue.Enqueue(new Token("Type", Types[SubSeg]));
-                else
+                else if (Types.ContainsKey(SubSeg) || Types.ContainsKey(SubSeg[..^2])) {
+                    string Type;
+                    if (SubSeg[^2..] == "[]")
+                        Type = Types[SubSeg[..^2]] + "Array";
+                    else
+                        Type = Types[SubSeg];
+
+                    TokenQueue.Enqueue(new Token("Type", Type));
+                } else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
 
                 continue;
@@ -158,8 +164,18 @@ class Tokenizer {
                 Pos++; continue;
             }
 
-            if (RawChar == '{' || RawChar == '}') {
+            if (RawChar == '{' || RawChar == '}') { // Handle braces
                 TokenQueue.Enqueue(new Token("Brace", Segment));
+                Pos++; continue;
+            }
+
+            if (RawChar == '[' || RawChar == ']') { // Handle brackets
+                TokenQueue.Enqueue(new Token("Bracket", Segment));
+                Pos++; continue;
+            }
+
+            if (RawChar == ',') { // Handle commas
+                TokenQueue.Enqueue(new Token("Comma", Segment));
                 Pos++; continue;
             }
 
