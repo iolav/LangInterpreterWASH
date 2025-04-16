@@ -1,9 +1,11 @@
-int test = 5
+int Test = 6
 
-if test < 6 then {
-    bool Hello = False
-
-    if test == 5 then {
-        Hello = True
-    }
+if Test / 2 == 2 then {
+    bool Output = "Hello!"
+} else if Test + 1 == 8 then {
+    bool Output = "Hi!"
+} else if Test * 2 == 16 then {
+    bool Output = "Hola!"
+} else {
+    bool Output = "Bye!"
 }

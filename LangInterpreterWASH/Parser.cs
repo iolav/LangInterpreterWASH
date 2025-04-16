@@ -1,8 +1,11 @@
+using System.Diagnostics;
+
 class ASTNode { // Node class to store things for the AST
     public string Action;
     public string Value;
     public ASTNode? Left;
     public ASTNode? Right;
+    public ASTNode? Middle;
     public List<ASTNode> Collection = [];
     public Enviornment? Env;
 
@@ -10,6 +13,16 @@ class ASTNode { // Node class to store things for the AST
         Action = A;
         Value = V;
         Left = L;
+        Right = R;
+
+        Env = null;
+    }
+
+    public ASTNode(string A, string V, ASTNode? L, ASTNode? M, ASTNode? R) { // For making a conditional node
+        Action = A;
+        Value = V;
+        Left = L;
+        Middle = M;
         Right = R;
 
         Env = null;
@@ -41,7 +54,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         Queue<ASTNode> Roots = [];
 
         while (TokenQueue.Count > 0) {
-            Roots.Enqueue(Statement(Roots.Count > 0 ? Roots.Peek() : null));
+            Roots.Enqueue(Statement());
         }
 
         return Roots;
@@ -49,17 +62,14 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
     private void CheckExpected(string Expected) {
         if (Dequeue().Value != Expected)
-            throw new Exception();
+            throw new Exception(Expected);
     }
 
-    private ASTNode Statement(ASTNode? PreviousRoot) {
+    private ASTNode Statement(ASTNode? PreviousNode = null) {
         Token Next = Peek();
 
         if (Next.Classifier == "Conditional")
-            if (Next.Value == "else")
-                return Conditional(PreviousRoot);
-            else
-                return Conditional(PreviousRoot);
+            return Conditional();
         else
             return Assignment();
     }
@@ -150,23 +160,20 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         return Node;
     }
 
-    private ASTNode Conditional(ASTNode? PreviousRoot) {
+    private ASTNode Conditional() {
         Token Keyword = Dequeue();
-        ASTNode Condition;
+        ASTNode? Condition = null;
 
-        if (Keyword.Value == "else" && Peek().Value != "if" && PreviousRoot != null && PreviousRoot.Left != null)
-            Condition = PreviousRoot.Left;
-        else if (Keyword.Value == "else" && PreviousRoot == null)
-            throw new Exception();
-        else {
-            Console.WriteLine(Peek().Value);
-            if (Peek().Value == "if") {
-                Keyword = Dequeue();
-            }
+        if (Keyword.Value == "if") {
+            Condition = Expression();
+
+            CheckExpected("then");
+        } else if (Keyword.Value == "else" && Peek().Value == "if") {
+            Dequeue();
 
             Condition = Expression();
 
-            CheckExpected("then"); 
+            Console.WriteLine(Condition.Value);
         }
 
         CheckExpected("{");
@@ -177,13 +184,22 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         ASTNode Block = new(WorkingEnv);
         
         while (TokenQueue.Count > 0 && Peek().Value != "}")
-            Block.Collection.Add(Statement(PreviousRoot));
+            Block.Collection.Add(Statement());
 
         CheckExpected("}");
 
         WorkingEnv = LocalEnv.Parent ?? GlobalEnv;
 
-        return new ASTNode("Conditional", Keyword.Value, Condition, Block);
+        ASTNode Node;
+        if (Peek().Value == "else") {
+            if (Condition == null)
+                throw new Exception(); // else on else
+
+            Node = new("Conditional", Keyword.Value, Condition, Block, Conditional());
+        } else
+            Node = new("Conditional", Keyword.Value, Condition, Block);
+
+        return Node;
     }
 
     private Token Peek() { // DRY method for peeking
@@ -202,6 +218,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
     public void DebugRoots(Queue<ASTNode> Roots) { // To help debug by printing out all nodes formatted
         Queue<ASTNode> RootsCopy = new(Roots);
+
         while (RootsCopy.Count > 0) {
             DebugNodes(RootsCopy.Dequeue());
         }
@@ -211,6 +228,8 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         if (Node.Left != null)
             DebugNodes(Node.Left, Indent + 4);
+        if (Node.Middle != null)
+            DebugNodes(Node.Middle, Indent + 4);
         if (Node.Right != null)
             DebugNodes(Node.Right, Indent + 4);
         if (Node.Collection.Count > 0) {

@@ -9,27 +9,24 @@ class Enviornment(Enviornment? P = null) {
         Console.WriteLine($"Stored variable \"{Identifier}\": {Value}");
     }
 
-    public ValuePair Fetch(string Identifier) { // Public method for fetching a variable
-        return Storage[Identifier];
-    }
+    public bool Fetch(string Identifier, out ValuePair Value) { // Public method for fetching a variable
+        ValuePair? Found = SimpleFind(Identifier);
 
-    public bool SimpleFind(string Identifier) {
-        return Storage.ContainsKey(Identifier);
-    }
-    public bool Find(string Identifier) { // Public method for checking if a variable exists
-        bool Found = Storage.ContainsKey(Identifier);
-        
-        if (Parent != null) {
-            Enviornment EnvParent = Parent;
+        Enviornment? CurrentEnv = Parent;
 
-            while (EnvParent.Parent != null && !Found) {
-                Found = EnvParent.SimpleFind(Identifier);
+        while (CurrentEnv != null && Found == null) {
+            Found = CurrentEnv.SimpleFind(Identifier);
 
-                EnvParent = EnvParent.Parent;
-            }
+            CurrentEnv = CurrentEnv.Parent;
         }
 
-        return Found;
+        Value = Found ?? default;
+
+        return Found != null;
+    }
+
+   public ValuePair? SimpleFind(string Identifier) {
+        return Storage.TryGetValue(Identifier, out (string, object) Value) ? Value : null;
     }
 
     public void DebugAll() { // Debugging method to just dump all the values

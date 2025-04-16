@@ -16,8 +16,8 @@ class Evaluator(Enviornment GE) {
                 return (Node.Action, int.Parse(Node.Value));
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
-            case "Identifier" when WorkingEnv.Find(Node.Value):
-                ValuePair Fetched = WorkingEnv.Fetch(Node.Value);
+            case "Identifier" when WorkingEnv.Fetch(Node.Value, out ValuePair Value):
+                ValuePair Fetched = Value;
                 return (Fetched.Item1, Fetched.Item2);
             case "String":
                 return (Node.Action, Node.Value[1..^1]);
@@ -33,11 +33,11 @@ class Evaluator(Enviornment GE) {
         }
 
         if (Node.Action == "Conditional") {
-            if (Node.Left == null || Node.Right == null)
-                throw new Exception(); // Shouldnt ever get here
+            bool Condition = Node.Left == null || (bool)Evaluate(Node.Left).Item2;
 
-            bool Condition = (bool)Evaluate(Node.Left).Item2;
-            if ((Condition && Node.Value == "if") || (!Condition && Node.Value == "else"))
+            if (Condition && Node.Middle != null)
+                Evaluate(Node.Middle);
+            else if (Node.Right != null)
                 Evaluate(Node.Right);
             
             return ("None", 0);
@@ -131,7 +131,7 @@ class Evaluator(Enviornment GE) {
 
             ValuePair RightNode = Evaluate(Node.Right);
             
-            if ((RightNode.Item1 != Node.Left.Action) && !WorkingEnv.Find(Node.Left.Value))
+            if ((RightNode.Item1 != Node.Left.Action) && !WorkingEnv.Fetch(Node.Left.Value, out ValuePair _))
                 throw new Exception(); // Type mismatch or missing type
 
             WorkingEnv.Store(Node.Left.Value, RightNode);
@@ -141,6 +141,7 @@ class Evaluator(Enviornment GE) {
 
         else if (Node.Action == "Empty")
             return ("None", 0);
+
         throw new Exception(); // Can happen if no valid action
     }
 }
