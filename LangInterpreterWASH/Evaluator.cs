@@ -57,6 +57,10 @@ class Evaluator(Enviornment GE) {
             return ("None", 0);
         }
 
+        if (Node.Action == "Array") {
+            return ("None", 0);
+        }
+
         if (Node.Action == "Operator") {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
@@ -112,7 +116,7 @@ class Evaluator(Enviornment GE) {
                 };
         }
 
-        else if (Node.Action == "Negate") {
+        if (Node.Action == "Negate") {
             if (Node.Left == null)
                 throw new Exception(); // Shouldnt ever get here
 
@@ -125,7 +129,7 @@ class Evaluator(Enviornment GE) {
             };
         }
 
-        else if (Node.Action == "Assignment") {
+        if (Node.Action == "Assignment") {
             if (Node.Left == null || Node.Right == null)
                 throw new Exception(); // Shouldnt ever get here
 
@@ -139,7 +143,7 @@ class Evaluator(Enviornment GE) {
             return ("None", 0);
         }
 
-        else if (Node.Action == "Empty")
+        if (Node.Action == "Empty")
             return ("None", 0);
 
         throw new Exception(); // Can happen if no valid action

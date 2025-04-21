@@ -94,14 +94,11 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             Dequeue();
             
             if (Peek().Value == "(") {
-                Dequeue();
+                CheckExpected("(");
 
                 ASTNode Node = Expression();
 
-                if (Peek().Value != ")")
-                    throw new Exception(); // Test case: "-(1 + 1"
-                
-                Dequeue();
+                CheckExpected(")");
 
                 return new ASTNode("Negate", "-", Node, null);
             }
@@ -113,16 +110,31 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         if (Next.Classifier == "Float" || Next.Classifier == "Integer")
             return new ASTNode(Next.Classifier, Dequeue().Value, null, null);
         else if (Next.Value == "(") {
-            Dequeue();
+            CheckExpected("(");
 
             ASTNode Node = Expression();
-
-            if (Peek().Value != ")")
-                throw new Exception(); // Test case: "(1 + 1"
             
-            Dequeue();
+            CheckExpected(")");
 
             return Node;
+        } else if (Next.Value == "[") {
+            CheckExpected("[");
+
+            ASTNode ArrayNode = new("Array", "", null, null);
+
+            while (TokenQueue.Count > 0 && Peek().Value != "]") {
+                ASTNode Element = Expression();
+                ArrayNode.Collection.Add(Element);
+
+                if (Peek().Value == ",")
+                    Dequeue();
+                else
+                    break;
+            }
+
+            CheckExpected("]");
+
+            return ArrayNode;
         } else
             return new ASTNode(Next.Classifier, Dequeue().Value, null, null);
 
@@ -145,11 +157,22 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
             ASTNode RightHandSide = Expression();
 
-            if (TypeToken != null) {
+            if (TypeToken != null) { // Ensure that bytes are correctly classified
                 Node.Action = TypeToken.Value;
 
                 if (TypeToken.Value == "Byte" && RightHandSide.Action == "Integer")
                     RightHandSide.Action = "Byte";
+
+                if (TypeToken.Value.EndsWith("Array") && RightHandSide.Action == "Array") {
+                    string SubType = TypeToken.Value.Replace("Array", "");
+
+                    foreach (ASTNode Element in RightHandSide.Collection) {
+                        if (Element.Action == "Integer" && SubType == "Byte")
+                            Element.Action = "Byte";
+                        else
+                            Element.Action = SubType;
+                    }
+                }
             }
 
             return new ASTNode("Assignment", AssignToken.Value, Node, RightHandSide);
