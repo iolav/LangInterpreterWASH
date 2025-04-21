@@ -6,7 +6,19 @@ class Enviornment(Enviornment? P = null) {
 
     public void Store(string Identifier, ValuePair Value) { // Public method for storing a variable
         Storage[Identifier] = (Value.Item1, Value.Item2);
-        Console.WriteLine($"Stored variable \"{Identifier}\": {Value}");
+
+        object PrintValue = Value.Item2;
+        if (Value.Item1 == "Array") {
+            PrintValue = "[";
+            
+            foreach (ValuePair Element in (List<ValuePair>)Value.Item2)
+                PrintValue += Element.Item2.ToString() + ", ";
+
+            string PrintValueStr = (string)PrintValue;
+            PrintValue = PrintValueStr[..^2] + "]";
+        }
+
+        Console.WriteLine($"Stored variable \"{Identifier}\": {PrintValue}");
     }
 
     public bool Fetch(string Identifier, out ValuePair Value) { // Public method for fetching a variable

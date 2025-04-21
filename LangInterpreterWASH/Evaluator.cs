@@ -58,7 +58,11 @@ class Evaluator(Enviornment GE) {
         }
 
         if (Node.Action == "Array") {
-            return ("None", 0);
+            List<ValuePair> Array = [];
+            foreach (ASTNode ChildNode in Node.Collection)
+                Array.Add(Evaluate(ChildNode));
+
+            return (Node.Action, Array);
         }
 
         if (Node.Action == "Operator") {
@@ -135,8 +139,22 @@ class Evaluator(Enviornment GE) {
 
             ValuePair RightNode = Evaluate(Node.Right);
             
-            if ((RightNode.Item1 != Node.Left.Action) && !WorkingEnv.Fetch(Node.Left.Value, out ValuePair _))
-                throw new Exception(); // Type mismatch or missing type
+            bool Fetched = WorkingEnv.Fetch(Node.Left.Value, out ValuePair Value);
+            bool HasType = Node.Left.Action != "Identifier";
+            if (!HasType && !Fetched)
+                throw new Exception(); // Missing type
+            else if (Fetched && Value.Item1 != RightNode.Item1)
+                throw new Exception(); // Type mismatch
+
+            if (RightNode.Item1 == "Array") {
+                string Type = Node.Left.Action.Replace("Array", "");
+                
+                foreach (ValuePair Element in (List<ValuePair>)RightNode.Item2)
+                {
+                    if (Element.Item1 != Type)
+                        throw new Exception(); // Type mismatch in array
+                }
+            }
 
             WorkingEnv.Store(Node.Left.Value, RightNode);
 

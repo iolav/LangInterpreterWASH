@@ -169,8 +169,6 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
                     foreach (ASTNode Element in RightHandSide.Collection) {
                         if (Element.Action == "Integer" && SubType == "Byte")
                             Element.Action = "Byte";
-                        else
-                            Element.Action = SubType;
                     }
                 }
             }
