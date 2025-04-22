@@ -119,25 +119,23 @@ class Tokenizer {
             if (char.IsLetter(RawChar)) { // Handle letters and keywords
                 int Start = Pos;
 
-                while (Pos < Len && (char.IsLetterOrDigit(Data[Pos]) || Data[Pos] == '[' || Data[Pos] == ']'))
+                while (Pos < Len && char.IsLetterOrDigit(Data[Pos]))
                     Pos++;
                 
-                string SubSeg = Data[Start .. Pos];
+                string SubSeg = Data[Start .. Pos];                
+
                 if (GenaricKeywords.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Keyword", SubSeg));
-                else if (SpecialKeywords.ContainsKey(SubSeg))
-                    TokenQueue.Enqueue(new Token(SpecialKeywords[SubSeg], SubSeg));
+                else if (SpecialKeywords.TryGetValue(SubSeg, out string? Value))
+                    TokenQueue.Enqueue(new Token(Value, SubSeg));
                 else if (SubSeg == "True" || SubSeg == "False")
                     TokenQueue.Enqueue(new Token("Boolean", SubSeg));
                 else if (Operators.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Operator", SubSeg));
-                else if (Types.ContainsKey(SubSeg) || Types.ContainsKey(SubSeg[..^2])) {
-                    string Type;
-                    if (SubSeg[^2..] == "[]")
-                        Type = Types[SubSeg[..^2]] + "Array";
-                    else
-                        Type = Types[SubSeg];
-
+                else if (Types.TryGetValue(SubSeg, out string? Value2)) {
+                    bool HasBrackets = Pos + 1 < Len && Data[Pos] == '[' && Data[Pos + 1] == ']';
+                    if (HasBrackets) Pos += 2;
+                    string Type = HasBrackets ? Value2 + "Array" : Value2;
                     TokenQueue.Enqueue(new Token("Type", Type));
                 } else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
