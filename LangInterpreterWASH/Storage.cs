@@ -21,7 +21,7 @@ class Enviornment(Enviornment? P = null) {
         Console.WriteLine($"Stored variable \"{Identifier}\": {PrintValue}");
     }
 
-    public bool Fetch(string Identifier, out ValuePair Value) { // Public method for fetching a variable
+    public bool Fetch(string Identifier, out ValuePair Value, out Enviornment? FoundEnv) { // Public method for fetching a variable
         ValuePair? Found = SimpleFind(Identifier);
 
         Enviornment? CurrentEnv = Parent;
@@ -29,10 +29,11 @@ class Enviornment(Enviornment? P = null) {
         while (CurrentEnv != null && Found == null) {
             Found = CurrentEnv.SimpleFind(Identifier);
 
-            CurrentEnv = CurrentEnv.Parent;
+            if (Found == null) CurrentEnv = CurrentEnv.Parent;
         }
 
         Value = Found ?? default;
+        FoundEnv = CurrentEnv;
 
         return Found != null;
     }

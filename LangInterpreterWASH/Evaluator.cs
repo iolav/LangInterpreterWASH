@@ -4,6 +4,16 @@ class Evaluator(Enviornment GE) {
     readonly private Enviornment GlobalEnv = GE;
     private Enviornment WorkingEnv = GE;
 
+    private ValuePair EvalWithEnv(ASTNode Node, Enviornment Env) {
+        WorkingEnv = Env;
+
+        ValuePair Evaluated = Evaluate(Node);
+
+        WorkingEnv = GlobalEnv;
+
+        return Evaluated;
+    }
+
     public void StartEval(Queue<ASTNode> Roots) { // Public method to evaluate all root nodes
         while (Roots.Count > 0)
             Evaluate(Roots.Dequeue());
@@ -15,7 +25,7 @@ class Evaluator(Enviornment GE) {
                 return (Node.Action, int.Parse(Node.Value));
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
-            case "Identifier" when WorkingEnv.Fetch(Node.Value, out ValuePair Value):
+            case "Identifier" when WorkingEnv.Fetch(Node.Value, out ValuePair Value, out Enviornment? _):
                 ValuePair Fetched = Value;
                 return (Fetched.Item1, Fetched.Item2);
             case "String":
@@ -39,6 +49,32 @@ class Evaluator(Enviornment GE) {
             else if (Node.Right != null)
                 Evaluate(Node.Right);
             
+            return ("None", 0);
+        }
+
+        if (Node.Action == "Iterative") {
+            if (Node.Left?.Right == null || Node.Middle == null || Node.Extra?.Env == null)
+                throw new Exception(); // Shouldnt ever get here
+
+            Enviornment BlockEnv = Node.Extra.Env;
+
+            ValuePair IndexValue = (ValuePair)EvalWithEnv(Node.Left, BlockEnv).Item2;
+            ValuePair IndexLimit = Evaluate(Node.Middle);
+
+            int Index = (int)IndexValue.Item2;
+            int Limit = (int)IndexLimit.Item2;
+            int Change = Node.Right != null ? (int)Evaluate(Node.Right).Item2 : 1;
+
+            while (Index <= Limit) {
+                Evaluate(Node.Extra);
+
+                Node.Left.Right.Value = (Index + Change).ToString();
+
+                IndexValue = (ValuePair)EvalWithEnv(Node.Left, BlockEnv).Item2;
+
+                Index = (int)IndexValue.Item2;
+            }
+
             return ("None", 0);
         }
 
@@ -138,8 +174,9 @@ class Evaluator(Enviornment GE) {
 
             ValuePair RightNode = Evaluate(Node.Right);
             
-            bool Fetched = WorkingEnv.Fetch(Node.Left.Value, out ValuePair Value);
+            bool Fetched = WorkingEnv.Fetch(Node.Left.Value, out ValuePair Value, out Enviornment? FoundEnv);
             bool HasType = Node.Left.Action != "Identifier";
+
             if (!HasType && !Fetched)
                 throw new Exception(); // Missing type
             else if (Fetched && Value.Item1 != RightNode.Item1)
@@ -160,9 +197,10 @@ class Evaluator(Enviornment GE) {
                 }
             }
 
-            WorkingEnv.Store(Node.Left.Value, RightNode);
+            Enviornment StorageEnv = FoundEnv ?? WorkingEnv;
+            StorageEnv.Store(Node.Left.Value, RightNode);
 
-            return ("None", 0);
+            return ("Assignment", RightNode);
         }
 
         if (Node.Action == "Empty")

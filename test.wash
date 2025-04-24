@@ -1,3 +1,7 @@
-for int i = 1, 10 do {
-    string test = "hi"
+string global = "me"
+
+for int i = 1, 2 do {
+    int test = i
 }
+
+int hi = i

@@ -1,11 +1,10 @@
-using System.Diagnostics;
-
 class ASTNode { // Node class to store things for the AST
     public string Action;
     public string Value;
     public ASTNode? Left;
     public ASTNode? Right;
     public ASTNode? Middle;
+    public ASTNode? Extra;
     public List<ASTNode> Collection = [];
     public Enviornment? Env;
 
@@ -24,6 +23,17 @@ class ASTNode { // Node class to store things for the AST
         Left = L;
         Middle = M;
         Right = R;
+
+        Env = null;
+    }
+
+    public ASTNode(string A, string V, ASTNode? L, ASTNode? M, ASTNode? R, ASTNode? E) { // For making a iterative node
+        Action = A;
+        Value = V;
+        Left = L;
+        Middle = M;
+        Right = R;
+        Extra = E;
 
         Env = null;
     }
@@ -224,7 +234,16 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         ASTNode Index = Assignment();
 
-        Console.WriteLine(Index);
+        CheckExpected(",");
+
+        ASTNode IndexLimit = Expression();
+
+        ASTNode? IndexChange = null;
+        if (Peek().Value == ",") {
+            CheckExpected(",");
+
+            IndexChange = Expression();
+        }
 
         CheckExpected("do");
         CheckExpected("{");
@@ -241,8 +260,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         WorkingEnv = LocalEnv.Parent ?? GlobalEnv;
 
-        return Index;
-        //return new("Conditional", Keyword.Value, n, Block);
+        return new("Iterative", Keyword.Value, Index, IndexLimit, IndexChange, Block);
     }
 
     private Token Peek() { // DRY method for peeking
