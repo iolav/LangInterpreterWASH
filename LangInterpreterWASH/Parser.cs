@@ -70,6 +70,8 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         if (Next.Classifier == "Conditional")
             return Conditional();
+        else if (Next.Classifier == "Iterative")
+            return Iterative();
         else
             return Assignment();
     }
@@ -215,6 +217,32 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             Node = new("Conditional", Keyword.Value, Condition, Block);
 
         return Node;
+    }
+
+    private ASTNode Iterative() {
+        Token Keyword = Dequeue();
+
+        ASTNode Index = Assignment();
+
+        Console.WriteLine(Index);
+
+        CheckExpected("do");
+        CheckExpected("{");
+
+        Enviornment LocalEnv = new(WorkingEnv);
+        WorkingEnv = LocalEnv;
+
+        ASTNode Block = new(WorkingEnv);
+        
+        while (TokenQueue.Count > 0 && Peek().Value != "}")
+            Block.Collection.Add(Statement());
+
+        CheckExpected("}");
+
+        WorkingEnv = LocalEnv.Parent ?? GlobalEnv;
+
+        return Index;
+        //return new("Conditional", Keyword.Value, n, Block);
     }
 
     private Token Peek() { // DRY method for peeking

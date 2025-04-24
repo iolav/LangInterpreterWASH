@@ -5,9 +5,8 @@ class Evaluator(Enviornment GE) {
     private Enviornment WorkingEnv = GE;
 
     public void StartEval(Queue<ASTNode> Roots) { // Public method to evaluate all root nodes
-        while (Roots.Count > 0) {
+        while (Roots.Count > 0)
             Evaluate(Roots.Dequeue());
-        }
     } 
 
     private ValuePair Evaluate(ASTNode Node) { // Start at top node and recursivly evaluate each one
@@ -147,7 +146,12 @@ class Evaluator(Enviornment GE) {
                 throw new Exception(); // Type mismatch
 
             if (RightNode.Item1 == "Array") {
-                string Type = Node.Left.Action.Replace("Array", "");
+                string LeftAction = Node.Left.Action;
+
+                if (!LeftAction.EndsWith("Array"))
+                    throw new Exception(); // Array defined with not array type
+
+                string Type = LeftAction.Replace("Array", "");
                 
                 foreach (ValuePair Element in (List<ValuePair>)RightNode.Item2)
                 {
