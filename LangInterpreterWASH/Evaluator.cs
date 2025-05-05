@@ -183,6 +183,8 @@ class Evaluator(Enviornment GE) {
                 throw new Exception(); // Missing type
             else if (Fetched && Value.Item1 != RightNode.Item1)
                 throw new Exception(); // Type mismatch
+            /*else if (Fetched && HasType)
+                throw new Exception(); // Same defined in same env*/
 
             if (RightNode.Item1 == "Array") {
                 string LeftAction = Node.Left.Action;
@@ -200,6 +202,7 @@ class Evaluator(Enviornment GE) {
             }
 
             Enviornment StorageEnv = FoundEnv ?? WorkingEnv;
+            
             StorageEnv.Store(Node.Left.Value, RightNode);
 
             return ("Assignment", RightNode);

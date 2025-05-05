@@ -18,7 +18,7 @@ class Enviornment(Enviornment? P = null) {
             PrintValue = PrintValueStr[..^2] + "]";
         }
 
-        Console.WriteLine($"Stored variable \"{Identifier}\": {PrintValue}");
+        Console.WriteLine($"Stored variable \"{Identifier}\": {PrintValue} (Global: {Parent == null})");
     }
 
     public bool Fetch(string Identifier, out ValuePair Value, out Enviornment? FoundEnv) { // Public method for fetching a variable
@@ -42,9 +42,9 @@ class Enviornment(Enviornment? P = null) {
         return Storage.TryGetValue(Identifier, out (string, object) Value) ? Value : null;
     }
 
-    public void DebugAll() { // Debugging method to just dump all the values
+    public void DebugValues() { // Debugging method to just dump all the values
         foreach (KeyValuePair<string, ValuePair> Entry in Storage) {
             Console.WriteLine($"{Entry.Key} = {Entry.Value}");
         }
     }
-} // add debug method to print whole tree 
+}

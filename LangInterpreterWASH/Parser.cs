@@ -293,6 +293,8 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             DebugNodes(Node.Middle, Indent + 4);
         if (Node.Right != null)
             DebugNodes(Node.Right, Indent + 4);
+        if (Node.Extra != null)
+            DebugNodes(Node.Extra, Indent + 4);
         if (Node.Collection.Count > 0) {
             foreach (ASTNode ChildNode in Node.Collection)
             {
