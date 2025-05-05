@@ -5,11 +5,13 @@ class Evaluator(Enviornment GE) {
     private Enviornment WorkingEnv = GE;
 
     private ValuePair EvalWithEnv(ASTNode Node, Enviornment Env) {
+        Enviornment PreviousEnv = WorkingEnv;
+
         WorkingEnv = Env;
 
         ValuePair Evaluated = Evaluate(Node);
 
-        WorkingEnv = GlobalEnv;
+        WorkingEnv = PreviousEnv;
 
         return Evaluated;
     }
@@ -176,7 +178,7 @@ class Evaluator(Enviornment GE) {
             
             bool Fetched = WorkingEnv.Fetch(Node.Left.Value, out ValuePair Value, out Enviornment? FoundEnv);
             bool HasType = Node.Left.Action != "Identifier";
-
+            
             if (!HasType && !Fetched)
                 throw new Exception(); // Missing type
             else if (Fetched && Value.Item1 != RightNode.Item1)

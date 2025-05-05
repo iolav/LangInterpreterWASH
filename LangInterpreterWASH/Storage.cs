@@ -47,4 +47,4 @@ class Enviornment(Enviornment? P = null) {
             Console.WriteLine($"{Entry.Key} = {Entry.Value}");
         }
     }
-}
+} // add debug method to print whole tree 
