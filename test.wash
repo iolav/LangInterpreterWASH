@@ -1,7 +1,1 @@
-string global = "me"
-
-for int i = 1, 2 do {
-    int test = i
-}
-
-int hi = i // i being assigned to global env when inc
+int[][] arr = [[1, 2, 3], [2, 3, 4]]
