@@ -27,9 +27,11 @@ class Evaluator(Enviornment GE) {
                 return (Node.Action, int.Parse(Node.Value));
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
-            case "Identifier" when WorkingEnv.Fetch(Node.Value, out ValuePair Value, out Enviornment? _):
-                ValuePair Fetched = Value;
-                return (Fetched.Item1, Fetched.Item2);
+            case "Identifier":
+                if (WorkingEnv.Fetch(Node.Value, out ValuePair Value, out Enviornment? _))
+                    return (Value.Item1, Value.Item2);
+                else
+                    throw new Exception(); // Refrence to non existant variable
             case "String":
                 return (Node.Action, Node.Value[1..^1]);
             case "Character":
