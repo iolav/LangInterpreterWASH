@@ -4,10 +4,21 @@ class Evaluator(Enviornment GE) {
     readonly private Enviornment GlobalEnv = GE;
     private Enviornment WorkingEnv = GE;
 
+    private ValuePair EvalWithEnv(ASTNode Node, Enviornment Env) {
+        Enviornment PreviousEnv = WorkingEnv;
+
+        WorkingEnv = Env;
+
+        ValuePair Evaluated = Evaluate(Node);
+
+        WorkingEnv = PreviousEnv;
+
+        return Evaluated;
+    }
+
     public void StartEval(Queue<ASTNode> Roots) { // Public method to evaluate all root nodes
-        while (Roots.Count > 0) {
+        while (Roots.Count > 0)
             Evaluate(Roots.Dequeue());
-        }
     } 
 
     private ValuePair Evaluate(ASTNode Node) { // Start at top node and recursivly evaluate each one
@@ -16,9 +27,11 @@ class Evaluator(Enviornment GE) {
                 return (Node.Action, int.Parse(Node.Value));
             case "Float":
                 return (Node.Action, float.Parse(Node.Value));
-            case "Identifier" when WorkingEnv.Fetch(Node.Value, out ValuePair Value):
-                ValuePair Fetched = Value;
-                return (Fetched.Item1, Fetched.Item2);
+            case "Identifier":
+                if (WorkingEnv.Fetch(Node.Value, out ValuePair Value, out Enviornment? _))
+                    return (Value.Item1, Value.Item2);
+                else
+                    throw new Exception(); // Refrence to non existant variable
             case "String":
                 return (Node.Action, Node.Value[1..^1]);
             case "Character":
@@ -40,6 +53,32 @@ class Evaluator(Enviornment GE) {
             else if (Node.Right != null)
                 Evaluate(Node.Right);
             
+            return ("None", 0);
+        }
+
+        if (Node.Action == "Iterative") {
+            if (Node.Left?.Right == null || Node.Middle == null || Node.Extra?.Env == null)
+                throw new Exception(); // Shouldnt ever get here
+
+            Enviornment BlockEnv = Node.Extra.Env;
+
+            ValuePair IndexValue = (ValuePair)EvalWithEnv(Node.Left, BlockEnv).Item2;
+            ValuePair IndexLimit = Evaluate(Node.Middle);
+
+            int Index = (int)IndexValue.Item2;
+            int Limit = (int)IndexLimit.Item2;
+            int Change = Node.Right != null ? (int)Evaluate(Node.Right).Item2 : 1;
+
+            while (Index <= Limit) {
+                Evaluate(Node.Extra);
+
+                Node.Left.Right.Value = (Index + Change).ToString();
+
+                IndexValue = (ValuePair)EvalWithEnv(Node.Left, BlockEnv).Item2;
+
+                Index = (int)IndexValue.Item2;
+            }
+
             return ("None", 0);
         }
 
@@ -139,15 +178,23 @@ class Evaluator(Enviornment GE) {
 
             ValuePair RightNode = Evaluate(Node.Right);
             
-            bool Fetched = WorkingEnv.Fetch(Node.Left.Value, out ValuePair Value);
+            bool Fetched = WorkingEnv.Fetch(Node.Left.Value, out ValuePair Value, out Enviornment? FoundEnv);
             bool HasType = Node.Left.Action != "Identifier";
+            
             if (!HasType && !Fetched)
                 throw new Exception(); // Missing type
             else if (Fetched && Value.Item1 != RightNode.Item1)
                 throw new Exception(); // Type mismatch
+            /*else if (Fetched && HasType)
+                throw new Exception(); // Same defined in same env*/
 
             if (RightNode.Item1 == "Array") {
-                string Type = Node.Left.Action.Replace("Array", "");
+                string LeftAction = Node.Left.Action;
+
+                if (!LeftAction.EndsWith("Array"))
+                    throw new Exception(); // Array defined with not array type
+
+                string Type = LeftAction.Replace("Array", "");
                 
                 foreach (ValuePair Element in (List<ValuePair>)RightNode.Item2)
                 {
@@ -156,9 +203,11 @@ class Evaluator(Enviornment GE) {
                 }
             }
 
-            WorkingEnv.Store(Node.Left.Value, RightNode);
+            Enviornment StorageEnv = FoundEnv ?? WorkingEnv;
+            
+            StorageEnv.Store(Node.Left.Value, RightNode);
 
-            return ("None", 0);
+            return ("Assignment", RightNode);
         }
 
         if (Node.Action == "Empty")

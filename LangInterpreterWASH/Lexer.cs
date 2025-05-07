@@ -11,10 +11,11 @@ class Token(string C, string V) // To store a tokens value and associating class
 class Tokenizer {
     readonly private string[] Operators = ["+", "-", "*", "/", "and", "or", ">", "<"];
 
-    readonly private string[] GenaricKeywords = ["then"];
+    readonly private string[] GenaricKeywords = ["then", "do"];
     readonly Dictionary<string, string> SpecialKeywords = new(){
         {"if", "Conditional"},
-        {"else", "Conditional"}
+        {"else", "Conditional"},
+        {"for", "Iterative"}
     };
 
     readonly Dictionary<string, string> Types = new(){

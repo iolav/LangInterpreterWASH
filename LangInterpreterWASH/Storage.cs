@@ -21,18 +21,19 @@ class Enviornment(Enviornment? P = null) {
         Console.WriteLine($"Stored variable \"{Identifier}\": {PrintValue}");
     }
 
-    public bool Fetch(string Identifier, out ValuePair Value) { // Public method for fetching a variable
+    public bool Fetch(string Identifier, out ValuePair Value, out Enviornment? FoundEnv) { // Public method for fetching a variable
         ValuePair? Found = SimpleFind(Identifier);
 
-        Enviornment? CurrentEnv = Parent;
+        Enviornment? CurrentEnv = Found == null ? Parent : this;
 
         while (CurrentEnv != null && Found == null) {
             Found = CurrentEnv.SimpleFind(Identifier);
 
-            CurrentEnv = CurrentEnv.Parent;
+            if (Found == null) CurrentEnv = CurrentEnv.Parent;
         }
 
         Value = Found ?? default;
+        FoundEnv = CurrentEnv;
 
         return Found != null;
     }
@@ -41,7 +42,7 @@ class Enviornment(Enviornment? P = null) {
         return Storage.TryGetValue(Identifier, out (string, object) Value) ? Value : null;
     }
 
-    public void DebugAll() { // Debugging method to just dump all the values
+    public void DebugValues() { // Debugging method to just dump all the values
         foreach (KeyValuePair<string, ValuePair> Entry in Storage) {
             Console.WriteLine($"{Entry.Key} = {Entry.Value}");
         }

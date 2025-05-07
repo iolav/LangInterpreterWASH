@@ -1,11 +1,10 @@
-using System.Diagnostics;
-
 class ASTNode { // Node class to store things for the AST
     public string Action;
     public string Value;
     public ASTNode? Left;
     public ASTNode? Right;
     public ASTNode? Middle;
+    public ASTNode? Extra;
     public List<ASTNode> Collection = [];
     public Enviornment? Env;
 
@@ -24,6 +23,17 @@ class ASTNode { // Node class to store things for the AST
         Left = L;
         Middle = M;
         Right = R;
+
+        Env = null;
+    }
+
+    public ASTNode(string A, string V, ASTNode? L, ASTNode? M, ASTNode? R, ASTNode? E) { // For making a iterative node
+        Action = A;
+        Value = V;
+        Left = L;
+        Middle = M;
+        Right = R;
+        Extra = E;
 
         Env = null;
     }
@@ -70,6 +80,8 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         if (Next.Classifier == "Conditional")
             return Conditional();
+        else if (Next.Classifier == "Iterative")
+            return Iterative();
         else
             return Assignment();
     }
@@ -217,6 +229,40 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
         return Node;
     }
 
+    private ASTNode Iterative() {
+        Token Keyword = Dequeue();
+
+        ASTNode Index = Assignment();
+
+        CheckExpected(",");
+
+        ASTNode IndexLimit = Expression();
+
+        ASTNode? IndexChange = null;
+        if (Peek().Value == ",") {
+            CheckExpected(",");
+
+            IndexChange = Expression();
+        }
+
+        CheckExpected("do");
+        CheckExpected("{");
+
+        Enviornment LocalEnv = new(WorkingEnv);
+        WorkingEnv = LocalEnv;
+
+        ASTNode Block = new(WorkingEnv);
+        
+        while (TokenQueue.Count > 0 && Peek().Value != "}")
+            Block.Collection.Add(Statement());
+
+        CheckExpected("}");
+
+        WorkingEnv = LocalEnv.Parent ?? GlobalEnv;
+
+        return new("Iterative", Keyword.Value, Index, IndexLimit, IndexChange, Block);
+    }
+
     private Token Peek() { // DRY method for peeking
         if (TokenQueue.Count > 0)
             return TokenQueue.Peek();
@@ -247,6 +293,8 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             DebugNodes(Node.Middle, Indent + 4);
         if (Node.Right != null)
             DebugNodes(Node.Right, Indent + 4);
+        if (Node.Extra != null)
+            DebugNodes(Node.Extra, Indent + 4);
         if (Node.Collection.Count > 0) {
             foreach (ASTNode ChildNode in Node.Collection)
             {
