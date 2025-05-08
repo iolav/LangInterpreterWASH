@@ -1,1 +1,3 @@
-int[][] arr
+int[][] arr // default values
+
+arr[1] // accessing
