@@ -1,4 +1,4 @@
-using ValuePair = (string, object);
+using ValuePair = (Type, object);
 
 class Evaluator(Enviornment GE) {
     readonly private Enviornment GlobalEnv = GE;

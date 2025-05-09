@@ -1,10 +1,10 @@
-class Token(string C, string V) // To store a tokens value and associating classifier
+class Token(Type T, string V) // To store a tokens value and associating classifier
 {
-    public readonly string Classifier = C;
+    public readonly Type TypeObject = T;
     public readonly string Value = V;
 
     public override string ToString() {
-        return $"Token:\n  : {Value}\n  : {Classifier}";
+        return $"Token:\n  : {Value}\n  : ";//{Classifier}";
     }
 }
 
@@ -84,8 +84,13 @@ class Tokenizer {
                     Pos++;
                 }
 
-                string Type = Deci ? "Float" : "Integer";
-                TokenQueue.Enqueue(new Token(Type, Data[Start .. Pos]));
+                Type TypeObject;
+                if (Deci)
+                    TypeObject = new Integer();
+                else
+                    TypeObject = new Float();
+                    
+                TokenQueue.Enqueue(new Token(TypeObject, Data[Start .. Pos]));
 
                 continue;
             }
@@ -100,7 +105,7 @@ class Tokenizer {
 
                 string SubSeg = Data[Start .. Pos];
 
-                TokenQueue.Enqueue(new Token("String", SubSeg));
+                TokenQueue.Enqueue(new Token(new String(), SubSeg));
 
                 continue;
             }
@@ -110,7 +115,7 @@ class Tokenizer {
                 if (SubSeg[2] != '\'')
                     throw new Exception(); // Char with more than one char (Ie. 'ab')
 
-                TokenQueue.Enqueue(new Token("Character", SubSeg));
+                TokenQueue.Enqueue(new Token(new Character(), SubSeg));
 
                 Pos += 3;
 
@@ -126,61 +131,76 @@ class Tokenizer {
                 string SubSeg = Data[Start .. Pos];                
 
                 if (GenaricKeywords.Contains(SubSeg))
-                    TokenQueue.Enqueue(new Token("Keyword", SubSeg));
+                    TokenQueue.Enqueue(new Token(new Identifier("Keyword"), SubSeg));
                 else if (SpecialKeywords.TryGetValue(SubSeg, out string? Value))
-                    TokenQueue.Enqueue(new Token(Value, SubSeg));
+                    TokenQueue.Enqueue(new Token(new Identifier(Value), SubSeg));
                 else if (SubSeg == "True" || SubSeg == "False")
-                    TokenQueue.Enqueue(new Token("Boolean", SubSeg));
+                    TokenQueue.Enqueue(new Token(new Boolean(), SubSeg));
                 else if (Operators.Contains(SubSeg))
-                    TokenQueue.Enqueue(new Token("Operator", SubSeg));
+                    TokenQueue.Enqueue(new Token(new Identifier("Operator"), SubSeg));
                 else if (Types.TryGetValue(SubSeg, out string? Value2)) {
-                    bool HasBrackets = Pos + 1 < Len && Data[Pos] == '[' && Data[Pos + 1] == ']';
-                    if (HasBrackets) Pos += 2;
-                    string Type = HasBrackets ? Value2 + "Array" : Value2;
-                    TokenQueue.Enqueue(new Token("Type", Type));
+                    int Dimensions = 0;
+                    bool Open = false;
+
+                    while (Pos < Len && (Data[Pos] == '[' || Data[Pos] == ']')) {
+                        Console.WriteLine(Data[Pos]);
+                        if (Data[Pos] == '[' && !Open)
+                            Open = true;
+                        else if (Data[Pos] == ']' && Open) {
+                            Open = false;
+                            Dimensions++;
+                        } else
+                            throw new Exception(); // Syntax error 
+                        Pos++;
+                    }
+
+                    System.Type SysType = System.Type.GetType(Value2) ?? throw new Exception(); // Attempted to use invalid type
+                    object TypeObject = Activator.CreateInstance(SysType) ?? throw new Exception(); // Same as above
+                    if (Dimensions > 0)
+                        TypeObject = new Array(Dimensions, (Type)TypeObject);
+
+                    TokenQueue.Enqueue(new Token((Type)TypeObject, SubSeg));
                 } else
-                    TokenQueue.Enqueue(new Token("Identifier", SubSeg));
+                    TokenQueue.Enqueue(new Token(new Identifier("None"), SubSeg));
 
                 continue;
             }
 
             if (Operators.Contains(Segment)) { // Handle single char operators
-                TokenQueue.Enqueue(new Token("Operator", Segment));
+                TokenQueue.Enqueue(new Token(new Identifier("Operator"), Segment));
                 Pos++; continue;
             }
 
             bool NextIsEquals = Pos + 1 < Len && Segment + Data[Pos + 1] == "==";
             if (RawChar == '=' && !NextIsEquals) { // Handle assignment equals
-                TokenQueue.Enqueue(new Token("Assignment", Segment));
+                TokenQueue.Enqueue(new Token(new Identifier("Assignment"), Segment));
                 Pos++; continue;
             } else if (NextIsEquals) {
-                TokenQueue.Enqueue(new Token("Operator", "=="));
+                TokenQueue.Enqueue(new Token(new Identifier("Operator"), "=="));
                 Pos += 2; continue;
             }
 
             if (RawChar == '(' || RawChar == ')') { // Handle parenthesis
-                TokenQueue.Enqueue(new Token("Parenthesis", Segment));
+                TokenQueue.Enqueue(new Token(new Identifier("Parenthesis"), Segment));
                 Pos++; continue;
             }
 
             if (RawChar == '{' || RawChar == '}') { // Handle braces
-                TokenQueue.Enqueue(new Token("Brace", Segment));
+                TokenQueue.Enqueue(new Token(new Identifier("Brace"), Segment));
                 Pos++; continue;
             }
 
             if (RawChar == '[' || RawChar == ']') { // Handle brackets
-                TokenQueue.Enqueue(new Token("Bracket", Segment));
+                TokenQueue.Enqueue(new Token(new Identifier("Bracket"), Segment));
                 Pos++; continue;
             }
 
             if (RawChar == ',') { // Handle commas
-                TokenQueue.Enqueue(new Token("Comma", Segment));
+                TokenQueue.Enqueue(new Token(new Identifier("Comma"), Segment));
                 Pos++; continue;
             }
 
-            TokenQueue.Enqueue(new Token("Unknown", Segment)); // Handle unknowns
-
-            Pos++;
+           throw new Exception(); // Unknown/unexpected character
         }
 
         return TokenQueue;

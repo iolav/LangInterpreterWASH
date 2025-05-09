@@ -78,9 +78,9 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
     private ASTNode Statement(ASTNode? PreviousNode = null) {
         Token Next = Peek();
 
-        if (Next.Classifier == "Conditional")
+        if (Next.TypeObject.Name == "Conditional")
             return Conditional();
-        else if (Next.Classifier == "Iterative")
+        else if (Next.TypeObject.Name == "Iterative")
             return Iterative();
         else
             return Assignment();
