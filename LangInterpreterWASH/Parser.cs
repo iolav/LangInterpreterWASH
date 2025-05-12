@@ -75,12 +75,12 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
             throw new Exception(Expected);
     }
 
-    private ASTNode Statement(ASTNode? PreviousNode = null) {
+    private ASTNode Statement() {
         Token Next = Peek();
 
-        if (Next.TypeObject.Name == "Conditional")
+        if (Next.Classifier == "Conditional")
             return Conditional();
-        else if (Next.TypeObject.Name == "Iterative")
+        else if (Next.Classifier == "Iterative")
             return Iterative();
         else
             return Assignment();
@@ -234,7 +234,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         ASTNode Index = Assignment();
 
-        CheckExpected(",");
+        Console.WriteLine(Peek());
 
         ASTNode IndexLimit = Expression();
 

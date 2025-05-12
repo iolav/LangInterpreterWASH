@@ -1,4 +1,4 @@
-using ValuePair = (Type, object);
+using ValuePair = (string, object);
 
 class Evaluator(Enviornment GE) {
     readonly private Enviornment GlobalEnv = GE;
@@ -185,8 +185,8 @@ class Evaluator(Enviornment GE) {
                 throw new Exception(); // Missing type
             else if (Fetched && Value.Item1 != RightNode.Item1)
                 throw new Exception(); // Type mismatch
-            /*else if (Fetched && HasType)
-                throw new Exception(); // Same defined in same env*/
+            else if (Fetched && HasType)
+                throw new Exception(); // Same defined in same env
 
             if (RightNode.Item1 == "Array") {
                 string LeftAction = Node.Left.Action;

@@ -11,4 +11,4 @@ Queue<ASTNode> Roots = Parse.Parse();
 Parse.DebugRoots(Roots);
 
 Evaluator Eval = new(GlobalEnv);
-//Eval.StartEval(Roots);
+Eval.StartEval(Roots);

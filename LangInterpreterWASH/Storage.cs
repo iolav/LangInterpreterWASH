@@ -1,4 +1,4 @@
-using ValuePair = (string, Type);
+using ValuePair = (string, object);
 
 class Enviornment(Enviornment? P = null) {
     private Dictionary<string, ValuePair> Storage = []; // Variable storage
@@ -39,7 +39,7 @@ class Enviornment(Enviornment? P = null) {
     }
 
    public ValuePair? SimpleFind(string Identifier) {
-        return Storage.TryGetValue(Identifier, out (string, Type) Value) ? Value : null;
+        return Storage.TryGetValue(Identifier, out (string, object) Value) ? Value : null;
     }
 
     public void DebugValues() { // Debugging method to just dump all the values
