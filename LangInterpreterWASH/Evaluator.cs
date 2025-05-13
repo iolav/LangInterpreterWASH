@@ -16,6 +16,19 @@ class Evaluator(Enviornment GE) {
         return Evaluated;
     }
 
+    private void VerifyArray(List<object> TopCollection, string ExpectedType, int Dimensions, int CurDimension = 1) {
+        foreach (var Element in TopCollection)
+        {
+            if (CurDimension == Dimensions) {
+                ValuePair CastedElement = (ValuePair)Element;
+                if (CastedElement.Item1 != ExpectedType)
+                    throw new Exception(); // Type mismatch in array
+            } else {
+                VerifyArray((List<object>)Element, ExpectedType, Dimensions, CurDimension + 1);
+            }
+        }
+    }
+
     public void StartEval(Queue<ASTNode> Roots) { // Public method to evaluate all root nodes
         while (Roots.Count > 0)
             Evaluate(Roots.Dequeue());
@@ -191,16 +204,13 @@ class Evaluator(Enviornment GE) {
             if (RightNode.Item1 == "Array") {
                 string LeftAction = Node.Left.Action;
 
-                if (!LeftAction.EndsWith("Array"))
+                if (!LeftAction[^6..^1].Equals("Array"))
                     throw new Exception(); // Array defined with not array type
 
-                string Type = LeftAction.Replace("Array", "");
+                string SubType = LeftAction[0..^6];
+                int Dimensions = LeftAction[^1] - '0';
                 
-                foreach (ValuePair Element in (List<ValuePair>)RightNode.Item2)
-                {
-                    if (Element.Item1 != Type)
-                        throw new Exception(); // Type mismatch in array
-                }
+                VerifyArray(Node, 1, Dimensions, SubType);
             }
 
             Enviornment StorageEnv = FoundEnv ?? WorkingEnv;

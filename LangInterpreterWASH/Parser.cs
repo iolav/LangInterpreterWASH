@@ -175,14 +175,16 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
                 if (TypeToken.Value == "Byte" && RightHandSide.Action == "Integer")
                     RightHandSide.Action = "Byte";
 
-                if (TypeToken.Value.EndsWith("Array") && RightHandSide.Action == "Array") {
-                    string SubType = TypeToken.Value.Replace("Array", "");
+                /*int ValueLen = TypeToken.Value.Length;
+                if (TypeToken.Value.Substring(ValueLen - 6, ValueLen - 1).Equals("Array") && RightHandSide.Action == "Array") {
+                    string SubType = TypeToken.Value.Replace("Array", "")[..(ValueLen - 1)];
+                    int Dimensions = int.Parse(TypeToken.Value[(ValueLen - 1)..]);
 
                     foreach (ASTNode Element in RightHandSide.Collection) {
                         if (Element.Action == "Integer" && SubType == "Byte")
                             Element.Action = "Byte";
                     }
-                }
+                }*/
             }
 
             return new ASTNode("Assignment", AssignToken.Value, Node, RightHandSide);

@@ -134,7 +134,7 @@ class Tokenizer {
                 else if (Operators.Contains(SubSeg))
                     TokenQueue.Enqueue(new Token("Operator", SubSeg));
                 else if (Types.TryGetValue(SubSeg, out string? Value2)) {
-                    string TypeStr = "";
+                    int Dimensions = 0;
                     bool Open = false;
 
                     while (Pos < Len && (Data[Pos] == '[' || Data[Pos] == ']')) {
@@ -142,13 +142,13 @@ class Tokenizer {
                             Open = true;
                         else if (Data[Pos] == ']' && Open) {
                             Open = false;
-                            TypeStr += "Array";
+                            Dimensions++;
                         } else
                             throw new Exception(); // Syntax error 
                         Pos++;
                     }
-
-                    TokenQueue.Enqueue(new Token(TypeStr.Length > 0 ? TypeStr : Value2, SubSeg));
+                    
+                    TokenQueue.Enqueue(new Token("Type", Value2 + (Dimensions > 0 ? "Array" + Dimensions : "")));
                 } else
                     TokenQueue.Enqueue(new Token("Identifier", SubSeg));
 
@@ -178,7 +178,7 @@ class Tokenizer {
                 TokenQueue.Enqueue(new Token("Brace", Segment));
                 Pos++; continue;
             }
-
+            
             if (RawChar == '[' || RawChar == ']') { // Handle brackets
                 TokenQueue.Enqueue(new Token("Bracket", Segment));
                 Pos++; continue;
