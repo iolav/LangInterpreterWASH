@@ -1,1 +1,23 @@
-int[][] hi = [[1, 2, 3], [4, 5, 6]]
+int Total = 0 // Iteration variables
+bool IsAddition = True
+
+int Length = 100 // Amount of numbers
+
+string OutputEnd = "!"
+
+/*
+    This is the main function
+    It will do stuff
+*/
+for int Number = 1, Length, 5 do {
+    if IsAddition then { // Doing the math
+        Total = Total + Number
+    } else {
+        Total = Total - Number
+    }
+
+    string Output = "Iterated" + OutputEnd // Putting out a output
+}
+
+int Final = Total / Length // Calculating the final average
+

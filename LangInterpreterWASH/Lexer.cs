@@ -24,7 +24,7 @@ class Tokenizer {
         {"bool", "Boolean"},
         {"string", "String"},
         {"char", "Character"},
-        {"byte", "Byte"},
+        //{"byte", "Byte"},
     };
     
     private bool CheckUnary(char RawChar, string Data, int Pos) { // Check if a negative sign is unary or not

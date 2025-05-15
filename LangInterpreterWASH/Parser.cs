@@ -236,7 +236,7 @@ class Parser(Queue<Token> TokenQueue, Enviornment GE) {
 
         ASTNode Index = Assignment();
 
-        Console.WriteLine(Peek());
+        CheckExpected(",");
 
         ASTNode IndexLimit = Expression();
 

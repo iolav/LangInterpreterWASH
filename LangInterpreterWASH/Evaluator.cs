@@ -16,17 +16,28 @@ class Evaluator(Enviornment GE) {
         return Evaluated;
     }
 
-    private void VerifyArray(List<object> TopCollection, string ExpectedType, int Dimensions, int CurDimension = 1) {
+    private void VerifyArray(List<ValuePair> TopCollection, string ExpectedType, int Dimensions, int CurDimension = 1) {
+        if (CurDimension > Dimensions)
+            throw new Exception(); // Dimensions mismatch in defined and given
+
         foreach (var Element in TopCollection)
-        {
-            if (CurDimension == Dimensions) {
-                ValuePair CastedElement = (ValuePair)Element;
-                if (CastedElement.Item1 != ExpectedType)
-                    throw new Exception(); // Type mismatch in array
-            } else {
-                VerifyArray((List<object>)Element, ExpectedType, Dimensions, CurDimension + 1);
+            {
+                if (CurDimension == Dimensions)
+                {
+                    ValuePair CastedElement = Element;
+                    if (CastedElement.Item1 != ExpectedType)
+                        throw new Exception(); // Type mismatch in array
+                }
+                else {
+                    List<ValuePair> NextList;
+                    try {
+                        NextList = (List<ValuePair>)Element.Item2;
+                    } catch {
+                        throw new Exception();
+                    }
+                    VerifyArray(NextList, ExpectedType, Dimensions, CurDimension + 1);
+                }
             }
-        }
     }
 
     public void StartEval(Queue<ASTNode> Roots) { // Public method to evaluate all root nodes
@@ -187,7 +198,7 @@ class Evaluator(Enviornment GE) {
 
         if (Node.Action == "Assignment") {
             if (Node.Left == null || Node.Right == null)
-                throw new Exception(); // Shouldnt ever get here
+                throw new Exception(); // No value or no identifier
 
             ValuePair RightNode = Evaluate(Node.Right);
             
@@ -198,8 +209,8 @@ class Evaluator(Enviornment GE) {
                 throw new Exception(); // Missing type
             else if (Fetched && Value.Item1 != RightNode.Item1)
                 throw new Exception(); // Type mismatch
-            else if (Fetched && HasType)
-                throw new Exception(); // Same defined in same env
+            /*else if (Fetched && HasType)
+                throw new Exception(); // Same defined in same env*/
 
             if (RightNode.Item1 == "Array") {
                 string LeftAction = Node.Left.Action;
@@ -210,7 +221,7 @@ class Evaluator(Enviornment GE) {
                 string SubType = LeftAction[0..^6];
                 int Dimensions = LeftAction[^1] - '0';
                 
-                VerifyArray(Node, 1, Dimensions, SubType);
+                VerifyArray((List<ValuePair>)RightNode.Item2, SubType, Dimensions);
             }
 
             Enviornment StorageEnv = FoundEnv ?? WorkingEnv;
